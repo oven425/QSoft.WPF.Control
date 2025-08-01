@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.Control", "QSoft.WPF.Control\QSoft.WPF.Control.csproj", "{65A7A891-1522-4043-B8CA-BDA781BAC75B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.ControlT", "QSoft.WPF.ControlT\QSoft.WPF.ControlT.csproj", "{F968538F-5581-4C72-BD04-32B8A0517DD5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65A7A891-1522-4043-B8CA-BDA781BAC75B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65A7A891-1522-4043-B8CA-BDA781BAC75B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65A7A891-1522-4043-B8CA-BDA781BAC75B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65A7A891-1522-4043-B8CA-BDA781BAC75B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D0D6B6B5-A646-4C68-B6F0-D46B4DE77AE8}
+	EndGlobalSection
+EndGlobal
