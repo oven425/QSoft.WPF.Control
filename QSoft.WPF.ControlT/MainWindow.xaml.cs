@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +21,18 @@ namespace QSoft.WPF.ControlT
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new MainUI();
         }
     }
+
+    public partial class MainUI:ObservableObject
+    {
+        [ObservableProperty]
+        int _Fix = 5;
+
+        public ObservableCollection<int> Items { set; get; } = [1,2,3,4,5];
+        [ObservableProperty]
+        int _Item = 3;
+    }
+
 }

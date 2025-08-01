@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QSoft.WPF.ControlT"
         mc:Ignorable="d"
+        xmlns:qcontrol="clr-namespace:QSoft.WPF.Control;assembly=QSoft.WPF.Control"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <StackPanel>
+        <GroupBox Header="Fix">
+            <StackPanel>
+                <TextBox Text="{Binding Fix, UpdateSourceTrigger=PropertyChanged}"/>
+                <qcontrol:RadioButtonList SelectedValue="{Binding Fix}" SelectedValuePath="Tag">
+                    <RadioButton GroupName="fix" Tag="5">5</RadioButton>
+                    <RadioButton GroupName="fix" Tag="50">50</RadioButton>
+                </qcontrol:RadioButtonList>
+            </StackPanel>
+        </GroupBox>
 
-    </Grid>
+        <GroupBox Header="Dynamic">
+            <StackPanel>
+                <TextBox Text="{Binding Item, UpdateSourceTrigger=PropertyChanged}"/>
+                <qcontrol:RadioButtonList ItemsSource="{Binding Items}" SelectedItem="{Binding Item}">
+                    <qcontrol:RadioButtonList.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton GroupName="item" Content="{Binding}"/>
+                        </DataTemplate>
+                    </qcontrol:RadioButtonList.ItemTemplate>
+                </qcontrol:RadioButtonList>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
 </Window>
