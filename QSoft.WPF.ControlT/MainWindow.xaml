@@ -4,29 +4,89 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QSoft.WPF.ControlT"
+        d:DataContext="{d:DesignInstance local:MainUI}"
         mc:Ignorable="d"
+        x:Name="local"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         xmlns:qcontrol="clr-namespace:QSoft.WPF.Control;assembly=QSoft.WPF.Control"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary Source="/RadioRoundButton.xaml"/>
+    </Window.Resources>
     <StackPanel>
         <GroupBox Header="Fix">
-            <StackPanel>
+            <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
                 <TextBox Text="{Binding Fix, UpdateSourceTrigger=PropertyChanged}"/>
-                <qcontrol:RadioButtonList SelectedValue="{Binding Fix}" SelectedValuePath="Tag">
-                    <RadioButton GroupName="fix" Tag="5">5</RadioButton>
-                    <RadioButton GroupName="fix" Tag="50">50</RadioButton>
+                <qcontrol:RadioButtonList SelectedValue="{Binding Fix}" SelectedValuePath="Tag" Height="35">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding SetFix1Command}" CommandParameter="{Binding Fix}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    
+                    <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="5">5</RadioButton>
+                    <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="50">50</RadioButton>
+                    <qcontrol:RadioButtonList.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                        </ItemsPanelTemplate>
+                    </qcontrol:RadioButtonList.ItemsPanel>
                 </qcontrol:RadioButtonList>
-            </StackPanel>
+            </qpanel:FlexPanel>
         </GroupBox>
 
         <GroupBox Header="Dynamic">
             <StackPanel>
                 <TextBox Text="{Binding Item, UpdateSourceTrigger=PropertyChanged}"/>
-                <qcontrol:RadioButtonList ItemsSource="{Binding Items}" SelectedItem="{Binding Item}">
+                <qcontrol:RadioButtonList ItemsSource="{Binding Items}" SelectedItem="{Binding Item}" Height="35">
                     <qcontrol:RadioButtonList.ItemTemplate>
                         <DataTemplate>
-                            <RadioButton GroupName="item" Content="{Binding}"/>
+                            <RadioButton Command="{Binding DataContext.SetItemCommand, ElementName=local}" GroupName="item" Content="{Binding}"/>
                         </DataTemplate>
                     </qcontrol:RadioButtonList.ItemTemplate>
+                    <qcontrol:RadioButtonList.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                        </ItemsPanelTemplate>
+                    </qcontrol:RadioButtonList.ItemsPanel>
+                </qcontrol:RadioButtonList>
+            </StackPanel>
+        </GroupBox>
+        
+        <GroupBox Header="DataItem">
+            <StackPanel>
+                <!--<TextBox Text="{Binding DataItem, UpdateSourceTrigger=PropertyChanged}"/>-->
+                <ComboBox SelectedItem="{Binding DataItem}" ItemsSource="{Binding DataItems}"/>
+                <qcontrol:RadioButtonList ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItem}" Height="35">
+                    <qcontrol:RadioButtonList.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton Command="{Binding DataContext.SetDataItemCommand, ElementName=local}" GroupName="dataitem" Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </qcontrol:RadioButtonList.ItemTemplate>
+                    <qcontrol:RadioButtonList.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                        </ItemsPanelTemplate>
+                    </qcontrol:RadioButtonList.ItemsPanel>
+                </qcontrol:RadioButtonList>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Header="DataItem by Id">
+            <StackPanel>
+                <TextBox Text="{Binding DataItemId, UpdateSourceTrigger=PropertyChanged}"/>
+                <qcontrol:RadioButtonList ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
+                    <qcontrol:RadioButtonList.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton Command="{Binding DataContext.SetDataItemCommand, ElementName=local}" GroupName="dataitem" Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </qcontrol:RadioButtonList.ItemTemplate>
+                    <qcontrol:RadioButtonList.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                        </ItemsPanelTemplate>
+                    </qcontrol:RadioButtonList.ItemsPanel>
                 </qcontrol:RadioButtonList>
             </StackPanel>
         </GroupBox>
