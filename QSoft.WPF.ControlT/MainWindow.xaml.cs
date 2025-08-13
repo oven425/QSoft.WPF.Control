@@ -84,7 +84,11 @@ namespace QSoft.WPF.ControlT
             await Task.Delay(100);
         }
 
-       
+        [RelayCommand]
+        async Task  Delay()
+        {
+            await Task.Delay(1000);
+        }
     }
 
     public record DataItem(int Id, string Name);

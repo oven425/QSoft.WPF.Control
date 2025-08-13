@@ -13,6 +13,12 @@ namespace QSoft.WPF.Control
 {
     public class RadioButtonList : Selector
     {
+        readonly static DependencyProperty ICommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(RadioButtonList));
+        public ICommand Command
+        {
+            get { return (ICommand)GetValue(ICommandProperty); }
+            set { SetValue(ICommandProperty, value); }
+        }
         static RadioButtonList()
         {
             //DefaultStyleKeyProperty.OverrideMetadata(typeof(RadioButtonList), new FrameworkPropertyMetadata(typeof(RadioButtonList)));
@@ -29,6 +35,8 @@ namespace QSoft.WPF.Control
 
             if (element is RadioButton radioButton)
             {
+                
+                radioButton.Loaded += RadioButton_Loaded;
                 radioButton.Checked += OnRadioButtonChecked;
                 if (item == this.SelectedItem)
                 {
@@ -38,6 +46,17 @@ namespace QSoft.WPF.Control
             else if (element is FrameworkElement container)
             {
                 container.Loaded += OnContainerLoaded;
+            }
+        }
+
+        private void RadioButton_Loaded(object sender, RoutedEventArgs e)
+        {
+            if(sender is RadioButton radioButton)
+            {
+                if (radioButton.Command == null && this.Command != null)
+                {
+                    radioButton.Command = this.Command;
+                }
             }
         }
 

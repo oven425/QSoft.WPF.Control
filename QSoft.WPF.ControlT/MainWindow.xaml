@@ -10,6 +10,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         xmlns:qcontrol="clr-namespace:QSoft.WPF.Control;assembly=QSoft.WPF.Control"
+        xmlns:qbh="clr-namespace:QSoft.WPF.Behavior"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <ResourceDictionary Source="/RadioRoundButton.xaml"/>
@@ -17,25 +18,40 @@
     <StackPanel>
         <TabControl>
             <TabItem Header="Fix">
-                <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
-                    <TextBox Text="{Binding Fix, UpdateSourceTrigger=PropertyChanged}"/>
-                    <qcontrol:RadioButtonList SelectedValue="{Binding Fix}" SelectedValuePath="Tag" Height="35">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="SelectionChanged">
-                                <i:InvokeCommandAction Command="{Binding SetFix1Command}" CommandParameter="{Binding Fix}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="5">5</RadioButton>
-                        <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="50">50</RadioButton>
-                        <qcontrol:RadioButtonList.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
-                            </ItemsPanelTemplate>
-                        </qcontrol:RadioButtonList.ItemsPanel>
-                    </qcontrol:RadioButtonList>
-                </qpanel:FlexPanel>
+                <StackPanel>
+                    <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
+                        <TextBox Text="{Binding Fix, UpdateSourceTrigger=PropertyChanged}"/>
+                        <qcontrol:RadioButtonList Command="{Binding DelayCommand}" SelectedValue="{Binding Fix}" SelectedValuePath="Tag" Height="35">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding SetFix1Command}" CommandParameter="{Binding Fix}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <RadioButton CommandParameter="{Binding Fix}" GroupName="fix" Tag="5">5</RadioButton>
+                            <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="50">50</RadioButton>
+                            <RadioButton IsEnabled="{Binding IsChecked, ElementName=checkbox_r3}" ToolTipService.ShowOnDisabled="True" Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="55" Content="55">
+                                <RadioButton.ToolTip>
+                                    <ToolTip Placement="Top">
+                                        <TextBlock Text="123fghjklkjhgfghj\r\nsdfghjhgcxcvbn"/>
+                                    </ToolTip>
+                                </RadioButton.ToolTip>
+                                <i:Interaction.Behaviors>
+                                    <qbh:TooltipAlignmentBehavior/>
+                                    <!--<qbh:CustomToolTipPrioritizedPlacementBehavior VerticalPlacement="Top" HorizontalPlacement="Right"/>-->
+                                </i:Interaction.Behaviors>
+                            </RadioButton>
+                            <qcontrol:RadioButtonList.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                                </ItemsPanelTemplate>
+                            </qcontrol:RadioButtonList.ItemsPanel>
+                        </qcontrol:RadioButtonList>
+                    </qpanel:FlexPanel>
+                    <CheckBox x:Name="checkbox_r3" IsChecked="True">radio3</CheckBox>
+                </StackPanel>
+                
             </TabItem>
-            <TabItem Header="Dynmaic">
+            <!--<TabItem Header="Dynmaic">
                 <StackPanel>
                     <TextBox Text="{Binding Item, UpdateSourceTrigger=PropertyChanged}"/>
                     <qcontrol:RadioButtonList ItemsSource="{Binding Items}" SelectedItem="{Binding Item}" Height="35">
@@ -85,7 +101,7 @@
                         </qcontrol:RadioButtonList.ItemsPanel>
                     </qcontrol:RadioButtonList>
                 </StackPanel>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
     </StackPanel>
 </Window>
