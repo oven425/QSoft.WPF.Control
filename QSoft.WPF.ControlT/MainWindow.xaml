@@ -27,6 +27,7 @@
                                     <i:InvokeCommandAction Command="{Binding SetFix1Command}" CommandParameter="{Binding Fix}"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
+                            <Button>123</Button>
                             <RadioButton CommandParameter="{Binding Fix}" GroupName="fix" Tag="5">5</RadioButton>
                             <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="50">50</RadioButton>
                             <RadioButton IsEnabled="{Binding IsChecked, ElementName=checkbox_r3}" ToolTipService.ShowOnDisabled="True" Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="55" Content="55">
@@ -51,7 +52,7 @@
                 </StackPanel>
                 
             </TabItem>
-            <!--<TabItem Header="Dynmaic">
+            <TabItem Header="Dynmaic">
                 <StackPanel>
                     <TextBox Text="{Binding Item, UpdateSourceTrigger=PropertyChanged}"/>
                     <qcontrol:RadioButtonList ItemsSource="{Binding Items}" SelectedItem="{Binding Item}" Height="35">
@@ -101,7 +102,7 @@
                         </qcontrol:RadioButtonList.ItemsPanel>
                     </qcontrol:RadioButtonList>
                 </StackPanel>
-            </TabItem>-->
+            </TabItem>
         </TabControl>
     </StackPanel>
 </Window>

@@ -66,6 +66,7 @@ namespace QSoft.WPF.Control
 
             if (element is RadioButton radioButton)
             {
+                radioButton.Loaded -= RadioButton_Loaded;
                 radioButton.Checked -= OnRadioButtonChecked;
             }
             else if (element is FrameworkElement container)
