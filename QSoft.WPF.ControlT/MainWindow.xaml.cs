@@ -33,6 +33,11 @@ namespace QSoft.WPF.ControlT
             System.Diagnostics.Trace.WriteLine($"SelectedValue:{radioButtonList.SelectedValue} SelectedValuePath:{radioButtonList.SelectedValuePath}");
 
         }
+
+        private void rr1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 
     public partial class MainUI:ObservableObject

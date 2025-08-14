@@ -27,7 +27,6 @@
                                     <i:InvokeCommandAction Command="{Binding SetFix1Command}" CommandParameter="{Binding Fix}"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                            <Button>123</Button>
                             <RadioButton CommandParameter="{Binding Fix}" GroupName="fix" Tag="5">5</RadioButton>
                             <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="50">50</RadioButton>
                             <RadioButton IsEnabled="{Binding IsChecked, ElementName=checkbox_r3}" ToolTipService.ShowOnDisabled="True" Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="55" Content="55">
@@ -37,7 +36,7 @@
                                     </ToolTip>
                                 </RadioButton.ToolTip>
                                 <i:Interaction.Behaviors>
-                                    <qbh:TooltipAlignmentBehavior/>
+                                    <qbh:TooltipAlignmentBehavior HorizontalAlignment="Left" Gap="10" Offset="20"/>
                                     <!--<qbh:CustomToolTipPrioritizedPlacementBehavior VerticalPlacement="Top" HorizontalPlacement="Right"/>-->
                                 </i:Interaction.Behaviors>
                             </RadioButton>
@@ -49,6 +48,11 @@
                         </qcontrol:RadioButtonList>
                     </qpanel:FlexPanel>
                     <CheckBox x:Name="checkbox_r3" IsChecked="True">radio3</CheckBox>
+                    <TextBlock Text="{Binding SelectedValue, ElementName=rr1}"/>
+                    <qcontrol:RadioButtonList1 x:Name="rr1" SelectionChanged="rr1_SelectionChanged" SelectedValuePath="Tag">
+                        <TextBlock Text="123" Tag="1" Background="Red"/>
+                        <TextBlock Text="456" Tag="2"/>
+                    </qcontrol:RadioButtonList1>
                 </StackPanel>
                 
             </TabItem>
