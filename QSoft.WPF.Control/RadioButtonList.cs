@@ -40,7 +40,7 @@ namespace QSoft.WPF.Control
                 radioButton.Checked += OnRadioButtonChecked;
                 if (item == this.SelectedItem)
                 {
-                    radioButton.IsChecked = true;
+                    //radioButton.IsChecked = true;
                 }
             }
             else if (element is FrameworkElement container)
@@ -85,6 +85,7 @@ namespace QSoft.WPF.Control
             if (sender is FrameworkElement container)
             {
                 var radioButton = FindVisualChild<RadioButton>(container);
+
                 if (radioButton != null)
                 {
                     radioButton.Checked -= OnRadioButtonChecked;
