@@ -16,7 +16,7 @@
         <ResourceDictionary Source="/RadioRoundButton.xaml"/>
     </Window.Resources>
     <StackPanel>
-        <TabControl>
+        <TabControl SelectedIndex="3">
             <TabItem Header="Fix">
                 <StackPanel>
                     <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
@@ -89,7 +89,7 @@
             <TabItem Header="DataItem by Id">
                 <StackPanel>
                     <TextBox Text="{Binding DataItemId, UpdateSourceTrigger=PropertyChanged}"/>
-                    <qcontrol:RadioButtonList ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
+                    <qcontrol:RadioButtonList Command="{Binding SetDataItemCommand}" ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
                         <qcontrol:RadioButtonList.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton Command="{Binding DataContext.SetDataItemCommand, ElementName=local}" GroupName="dataitem" Content="{Binding Name}"/>
@@ -103,10 +103,28 @@
                     </qcontrol:RadioButtonList>
                 </StackPanel>
             </TabItem>
-            <!--<TabItem Header="DataItem by DisplayMemberPath">
+            <TabItem Header="DataItem by DisplayMemberPath">
                 <StackPanel>
                     <TextBox Text="{Binding DataItemId, UpdateSourceTrigger=PropertyChanged}"/>
                     <qcontrol:RadioButtonList ItemsSource="{Binding DataItems}" DisplayMemberPath="Name" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
+                        <qcontrol:RadioButtonList.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource radiobtn}" TargetType="RadioButton">
+                                <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                                <Setter Property="ToolTip">
+                                    <Setter.Value>
+                                        <ToolTip Placement="Top">
+                                            <TextBlock Text="123fghjklkjhgfghj\r\nsdfghjhgcxcvbn"/>
+                                        </ToolTip>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="i:Interaction.Behaviors">
+                                    <Setter.Value>
+                                        <qbh:TooltipAlignmentBehavior HorizontalAlignment="Left" Gap="10" Offset="20"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                            
+                        </qcontrol:RadioButtonList.ItemContainerStyle>
                         <qcontrol:RadioButtonList.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
@@ -114,7 +132,7 @@
                         </qcontrol:RadioButtonList.ItemsPanel>
                     </qcontrol:RadioButtonList>
                 </StackPanel>
-            </TabItem>-->
+            </TabItem>
         </TabControl>
     </StackPanel>
 </Window>

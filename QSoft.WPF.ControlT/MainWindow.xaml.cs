@@ -83,8 +83,14 @@ namespace QSoft.WPF.ControlT
             new DataItem(5, "Item 5")
         ];
 
+        //[RelayCommand(AllowConcurrentExecutions = false)]
+        //async Task SetDataItem(DataItem data)
+        //{
+        //    await Task.Delay(100);
+        //}
+
         [RelayCommand(AllowConcurrentExecutions = false)]
-        async Task SetDataItem(DataItem data)
+        async Task SetDataItem()
         {
             await Task.Delay(100);
         }
@@ -96,6 +102,22 @@ namespace QSoft.WPF.ControlT
         }
     }
 
-    public record DataItem(int Id, string Name);
+    public partial class DataItem(int Id, string Name):ObservableObject
+    {
+        [ObservableProperty]
+        int _Id = Id;
+        [ObservableProperty]
+        string _Name = Name;
+
+        [ObservableProperty]
+        bool _IsEnabled = true;
+
+        public override string ToString()
+        {
+            return $"{Id} {Name}";
+        }
+    }
+
+    
 
 }

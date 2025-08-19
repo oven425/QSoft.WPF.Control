@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,12 +9,21 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace QSoft.WPF.Control
 {
     public class RadioButtonList : Selector
     {
+        readonly static DependencyProperty GroupNameProperty = DependencyProperty.Register("GroupName", typeof(string), typeof(RadioButtonList), new PropertyMetadata(Guid.NewGuid().ToString()));
+        [Category("RadioButtonList")]
+        public string GroupName
+        {
+            get { return (string)GetValue(GroupNameProperty); }
+            set { SetValue(GroupNameProperty, value); }
+        }
         readonly static DependencyProperty ICommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(RadioButtonList));
+        [Category("RadioButtonList")]
         public ICommand Command
         {
             get { return (ICommand)GetValue(ICommandProperty); }
@@ -26,13 +36,28 @@ namespace QSoft.WPF.Control
 
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
+            
             return item is RadioButton;
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            if(this.DisplayMemberPath != string.Empty)
+            {
+                var radioButton = new RadioButton();
+                radioButton.GroupName = this.GroupName;
+                return radioButton;
+            }
+            //return new RadioButton();
+
+            return  base.GetContainerForItemOverride();
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-            base.PrepareContainerForItemOverride(element, item);
 
+            base.PrepareContainerForItemOverride(element, item);
+            
             if (element is RadioButton radioButton)
             {
                 
@@ -40,12 +65,17 @@ namespace QSoft.WPF.Control
                 radioButton.Checked += OnRadioButtonChecked;
                 if (item == this.SelectedItem)
                 {
-                    //radioButton.IsChecked = true;
+                    radioButton.IsChecked = true;
                 }
+                
             }
             else if (element is FrameworkElement container)
             {
                 container.Loaded += OnContainerLoaded;
+            }
+            else
+            {
+
             }
         }
 
@@ -84,10 +114,21 @@ namespace QSoft.WPF.Control
         {
             if (sender is FrameworkElement container)
             {
-                var radioButton = FindVisualChild<RadioButton>(container);
+                var control = VisualTreeHelper.GetChild(container, 0);
+                var radioButton= control as RadioButton;
+                if(radioButton == null)
+                {
+                    radioButton = new RadioButton();
+                    radioButton.Content = control;
+                    radioButton.DataContext = container.DataContext;
+                }
 
                 if (radioButton != null)
                 {
+                    if(string.IsNullOrEmpty(radioButton.GroupName))
+                    {
+                        radioButton.GroupName = this.GroupName;
+                    }
                     radioButton.Checked -= OnRadioButtonChecked;
                     radioButton.Checked += OnRadioButtonChecked;
 
