@@ -117,11 +117,11 @@
                                         </ToolTip>
                                     </Setter.Value>
                                 </Setter>
-                                <Setter Property="i:Interaction.Behaviors">
+                                <!--<Setter Property="i:Interaction.Behaviors">
                                     <Setter.Value>
                                         <qbh:TooltipAlignmentBehavior HorizontalAlignment="Left" Gap="10" Offset="20"/>
                                     </Setter.Value>
-                                </Setter>
+                                </Setter>-->
                             </Style>
                             
                         </qcontrol:RadioButtonList.ItemContainerStyle>
