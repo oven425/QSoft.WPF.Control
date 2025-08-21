@@ -48,8 +48,6 @@ namespace QSoft.WPF.Control
                 radioButton.GroupName = this.GroupName;
                 return radioButton;
             }
-            //return new RadioButton();
-
             return  base.GetContainerForItemOverride();
         }
 
@@ -60,7 +58,6 @@ namespace QSoft.WPF.Control
             
             if (element is RadioButton radioButton)
             {
-                
                 radioButton.Loaded += RadioButton_Loaded;
                 radioButton.Checked += OnRadioButtonChecked;
                 if (item == this.SelectedItem)

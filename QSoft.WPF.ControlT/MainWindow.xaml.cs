@@ -71,16 +71,16 @@ namespace QSoft.WPF.ControlT
         int _ID;
 
         [ObservableProperty]
-        DataItem _DataItem = new(2, "Item 2");
+        DataItemRecord _DataItem = new(2, "Item 2");
         [ObservableProperty]
         int _DataItemId = 3;
-        public ObservableCollection<DataItem> DataItems { set; get; } =
+        public ObservableCollection<DataItemRecord> DataItems { set; get; } =
         [
-            new DataItem(1, "Item 1"),
-            new DataItem(2, "Item 2"),
-            new DataItem(3, "Item 3"),
-            new DataItem(4, "Item 4"),
-            new DataItem(5, "Item 5")
+            new DataItemRecord(1, "Item 1"),
+            new DataItemRecord(2, "Item 2"),
+            new DataItemRecord(3, "Item 3"),
+            new DataItemRecord(4, "Item 4"),
+            new DataItemRecord(5, "Item 5")
         ];
 
         //[RelayCommand(AllowConcurrentExecutions = false)]
@@ -118,6 +118,9 @@ namespace QSoft.WPF.ControlT
         }
     }
 
-    
+
+    public record DataItemRecord(int Id, string Name);
+
+
 
 }
