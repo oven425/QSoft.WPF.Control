@@ -23,7 +23,7 @@
         </Setter>
     </Style>
     <Style TargetType="RadioButton" BasedOn="{StaticResource radiobtn}" />
-    <Style TargetType="{x:Type ListBox}">
+    <!--<Style TargetType="{x:Type ListBox}">
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -40,5 +40,5 @@
                 </Style>
             </Setter.Value>
         </Setter>
-    </Style>
+    </Style>-->
 </ResourceDictionary>

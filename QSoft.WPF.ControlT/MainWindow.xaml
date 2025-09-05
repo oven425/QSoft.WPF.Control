@@ -16,7 +16,7 @@
         <ResourceDictionary Source="/RadioRoundButton.xaml"/>
     </Window.Resources>
     <StackPanel>
-        <TabControl SelectedIndex="2">
+        <TabControl SelectedIndex="0">
             <TabItem Header="Fix">
                 <StackPanel>
                     <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
@@ -30,15 +30,6 @@
                             <RadioButton CommandParameter="{Binding Fix}" GroupName="fix" Tag="5">5</RadioButton>
                             <RadioButton Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="50">50</RadioButton>
                             <RadioButton IsEnabled="{Binding IsChecked, ElementName=checkbox_r3}" ToolTipService.ShowOnDisabled="True" Command="{Binding SetFixCommand}" CommandParameter="{Binding Fix}" GroupName="fix" Tag="55" Content="55">
-                                <RadioButton.ToolTip>
-                                    <ToolTip Placement="Top">
-                                        <TextBlock Text="123fghjklkjhgfghj\r\nsdfghjhgcxcvbn"/>
-                                    </ToolTip>
-                                </RadioButton.ToolTip>
-                                <i:Interaction.Behaviors>
-                                    <qbh:TooltipAlignmentBehavior HorizontalAlignment="Left" Gap="10" Offset="20"/>
-                                    <!--<qbh:CustomToolTipPrioritizedPlacementBehavior VerticalPlacement="Top" HorizontalPlacement="Right"/>-->
-                                </i:Interaction.Behaviors>
                             </RadioButton>
                             <qcontrol:RadioButtonList.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -89,7 +80,7 @@
             <TabItem Header="DataItem by Id">
                 <StackPanel>
                     <TextBox Text="{Binding DataItemId, UpdateSourceTrigger=PropertyChanged}"/>
-                    <qcontrol:RadioButtonList Command="{Binding SetDataItemCommand}" ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
+                    <!--<qcontrol:RadioButtonList Command="{Binding SetDataItemCommand}" ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
                         <qcontrol:RadioButtonList.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton Command="{Binding DataContext.SetDataItemCommand, ElementName=local}" GroupName="dataitem" Content="{Binding Name}"/>
@@ -100,7 +91,20 @@
                                 <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
                             </ItemsPanelTemplate>
                         </qcontrol:RadioButtonList.ItemsPanel>
+                    </qcontrol:RadioButtonList>-->
+                    <qcontrol:RadioButtonList Command="{Binding SetDataItemCommand}" ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
+                        <qcontrol:RadioButtonList.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </qcontrol:RadioButtonList.ItemTemplate>
+                        <qcontrol:RadioButtonList.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                            </ItemsPanelTemplate>
+                        </qcontrol:RadioButtonList.ItemsPanel>
                     </qcontrol:RadioButtonList>
+
                 </StackPanel>
             </TabItem>
             <TabItem Header="DataItem by DisplayMemberPath">
@@ -132,6 +136,35 @@
                         </qcontrol:RadioButtonList.ItemsPanel>
                     </qcontrol:RadioButtonList>
                 </StackPanel>
+            </TabItem>
+            <TabItem Header="Peoples">
+                <StackPanel>
+                    <GroupBox Header="Radiolist">
+                        <StackPanel>
+                            <TextBox Text="{Binding SelectedValue, ElementName=rr10}"/>
+                            <qcontrol:RadioButtonList Command="{Binding DelayCommand}" x:Name="rr10" SelectedIndex="0"  ItemsSource="{Binding Peoples}" SelectedValuePath="Address.Auth.Account" DisplayMemberPath="Name" Height="35">
+                                <qcontrol:RadioButtonList.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                                    </ItemsPanelTemplate>
+                                </qcontrol:RadioButtonList.ItemsPanel>
+                            </qcontrol:RadioButtonList>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="ListBox">
+                        <StackPanel>
+                            <TextBox Text="{Binding SelectedValue, ElementName=rr9}"/>
+                            <ListBox  x:Name="rr9" SelectedIndex="0"  ItemsSource="{Binding Peoples}" SelectedValuePath="Address.Auth.Account" DisplayMemberPath="Name" Height="35">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                            </ListBox>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+
             </TabItem>
         </TabControl>
     </StackPanel>

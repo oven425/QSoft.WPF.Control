@@ -74,13 +74,22 @@ namespace QSoft.WPF.ControlT
         DataItemRecord _DataItem = new(2, "Item 2");
         [ObservableProperty]
         int _DataItemId = 3;
-        public ObservableCollection<DataItemRecord> DataItems { set; get; } =
+        public ObservableCollection<DataItemRecord> DataItemRecords { set; get; } =
         [
             new DataItemRecord(1, "Item 1"),
             new DataItemRecord(2, "Item 2"),
             new DataItemRecord(3, "Item 3"),
             new DataItemRecord(4, "Item 4"),
             new DataItemRecord(5, "Item 5")
+        ];
+
+        public ObservableCollection<DataItem> DataItems { set; get; } =
+        [
+            new DataItem(1, "Item 1"),
+            new DataItem(2, "Item 2"),
+            new DataItem(3, "Item 3"),
+            new DataItem(4, "Item 4"),
+            new DataItem(5, "Item 5")
         ];
 
         //[RelayCommand(AllowConcurrentExecutions = false)]
@@ -100,6 +109,49 @@ namespace QSoft.WPF.ControlT
         {
             await Task.Delay(1000);
         }
+
+        public ObservableCollection<People> Peoples { set; get; } =
+        [
+            new People()
+            {
+                Name="AA",
+                Address = new Address()
+                {
+                    Path = "PathAA",
+                    Auth = new Auth()
+                    {
+                        Account = "AccountAA",
+                        Password = "PasswordAA"
+                    }
+                }
+            },
+            new People()
+            {
+                Name="BB",
+                Address = new Address()
+                {
+                    Path = "PathBB",
+                    Auth = new Auth()
+                    {
+                        Account = "AccountBB",
+                        Password = "PasswordBB"
+                    }
+                }
+            },
+            new People()
+            {
+                Name="CC",
+                Address = new Address()
+                {
+                    Path = "PathCC",
+                    Auth = new Auth()
+                    {
+                        Account = "AccountCC",
+                        Password = "PasswordCC"
+                    }
+                }
+            }
+        ];
     }
 
     public partial class DataItem(int Id, string Name):ObservableObject
@@ -121,6 +173,20 @@ namespace QSoft.WPF.ControlT
 
     public record DataItemRecord(int Id, string Name);
 
-
+    public class Auth
+    {
+        public string Account { set; get; }
+        public string Password { set; get; }
+    }
+    public class Address
+    {
+        public Auth Auth { set; get; }
+        public string Path { set; get; }
+    }
+    public class People
+    {
+        public Address Address { set; get; }
+        public string Name { set; get; }
+    }
 
 }

@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Xml.Linq;
 
 namespace QSoft.WPF.Control
 {
     public class RadioButtonList : Selector
     {
-        readonly static DependencyProperty GroupNameProperty = DependencyProperty.Register("GroupName", typeof(string), typeof(RadioButtonList), new PropertyMetadata(Guid.NewGuid().ToString()));
+        readonly static DependencyProperty GroupNameProperty = DependencyProperty.Register(nameof(GroupName), typeof(string), typeof(RadioButtonList), new PropertyMetadata(Guid.NewGuid().ToString()));
         [Category("RadioButtonList")]
         public string GroupName
         {
-            get { return (string)GetValue(GroupNameProperty); }
-            set { SetValue(GroupNameProperty, value); }
+            get => (string)GetValue(GroupNameProperty);
+            set => SetValue(GroupNameProperty, value);
         }
-        readonly static DependencyProperty ICommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(RadioButtonList));
+        readonly static DependencyProperty ICommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(RadioButtonList));
         [Category("RadioButtonList")]
         public ICommand Command
         {
-            get { return (ICommand)GetValue(ICommandProperty); }
-            set { SetValue(ICommandProperty, value); }
+            get => (ICommand)GetValue(ICommandProperty);
+            set => SetValue(ICommandProperty, value);
         }
         static RadioButtonList()
         {
@@ -36,35 +39,44 @@ namespace QSoft.WPF.Control
 
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            
             return item is RadioButton;
         }
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-            if(this.DisplayMemberPath != string.Empty)
+            return new RadioButton();
+            if(!string.IsNullOrEmpty(this.DisplayMemberPath))
             {
                 var radioButton = new RadioButton();
-                radioButton.GroupName = this.GroupName;
+                //radioButton.GroupName = this.GroupName;
                 return radioButton;
             }
+
             return  base.GetContainerForItemOverride();
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-
             base.PrepareContainerForItemOverride(element, item);
-            
             if (element is RadioButton radioButton)
             {
-                radioButton.Loaded += RadioButton_Loaded;
-                radioButton.Checked += OnRadioButtonChecked;
                 if (item == this.SelectedItem)
                 {
                     radioButton.IsChecked = true;
                 }
-                
+                radioButton.Checked += OnRadioButtonChecked;
+                radioButton.SetBinding(RadioButton.CommandProperty, new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath(nameof(Command)),
+                    Mode = BindingMode.OneWay
+                });
+                radioButton.SetBinding(RadioButton.GroupNameProperty, new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath(nameof(GroupName)),
+                    Mode = BindingMode.OneWay
+                });
             }
             else if (element is FrameworkElement container)
             {
@@ -76,24 +88,12 @@ namespace QSoft.WPF.Control
             }
         }
 
-        private void RadioButton_Loaded(object sender, RoutedEventArgs e)
-        {
-            if(sender is RadioButton radioButton)
-            {
-                if (radioButton.Command == null && this.Command != null)
-                {
-                    radioButton.Command = this.Command;
-                }
-            }
-        }
-
         protected override void ClearContainerForItemOverride(DependencyObject element, object item)
         {
             base.ClearContainerForItemOverride(element, item);
 
             if (element is RadioButton radioButton)
             {
-                radioButton.Loaded -= RadioButton_Loaded;
                 radioButton.Checked -= OnRadioButtonChecked;
             }
             else if (element is FrameworkElement container)
@@ -113,12 +113,12 @@ namespace QSoft.WPF.Control
             {
                 var control = VisualTreeHelper.GetChild(container, 0);
                 var radioButton= control as RadioButton;
-                if(radioButton == null)
-                {
-                    radioButton = new RadioButton();
-                    radioButton.Content = control;
-                    radioButton.DataContext = container.DataContext;
-                }
+                //if(radioButton == null)
+                //{
+                //    radioButton = new RadioButton();
+                //    radioButton.Content = control;
+                //    radioButton.DataContext = container.DataContext;
+                //}
 
                 if (radioButton != null)
                 {
@@ -126,49 +126,60 @@ namespace QSoft.WPF.Control
                     {
                         radioButton.GroupName = this.GroupName;
                     }
-                    radioButton.Checked -= OnRadioButtonChecked;
-                    radioButton.Checked += OnRadioButtonChecked;
+                    //radioButton.Checked -= OnRadioButtonChecked;
+                    //radioButton.Checked += OnRadioButtonChecked;
 
-                    if (this.SelectedValue != null && this.SelectedValue.Equals(GetChildProperty(radioButton)))
-                    {
-                        radioButton.IsChecked = true;
-                    }
+                    //if (this.SelectedValue != null && this.SelectedValue.Equals(GetChildProperty(radioButton)))
+                    //{
+                    //    radioButton.IsChecked = true;
+                    //}
+
+                    //radioButton.SetBinding(ToggleButton.IsCheckedProperty, new Binding
+                    //{
+                    //    Path = new PropertyPath("IsSelected"),
+                    //    RelativeSource = new RelativeSource(RelativeSourceMode.Self),
+                    //    Mode = BindingMode.TwoWay
+                    //});
                 }
             }
         }
 
-        object? GetChildProperty(RadioButton rbtn)
-        {
-            if (string.IsNullOrEmpty(this.SelectedValuePath))
-            {
-                return rbtn.DataContext;
-            }
-            else
-            {
-                var pp = typeof(RadioButton).GetProperty(this.SelectedValuePath);
-                var vv = pp?.GetValue(rbtn, null);
-                if(vv == null)
-                {
-                    pp = rbtn.DataContext.GetType().GetProperty(this.SelectedValuePath);
-                    vv = pp?.GetValue(rbtn.DataContext, null);
-                }
-                return vv;
-            }
-        }
+        //object? GetChildProperty(RadioButton rbtn)
+        //{
+        //    if (string.IsNullOrEmpty(this.SelectedValuePath))
+        //    {
+        //        return rbtn.DataContext;
+        //    }
+        //    else
+        //    {
+        //        return this.SelectedValue;
+        //        //var pp = typeof(RadioButton).GetProperty(this.SelectedValuePath);
+        //        //var vv = pp?.GetValue(rbtn, null);
+        //        //if(vv == null)
+        //        //{
+        //        //    pp = rbtn.DataContext.GetType().GetProperty(this.SelectedValuePath);
+        //        //    vv = pp?.GetValue(rbtn.DataContext, null);
+        //        //}
+        //        //return vv;
+        //    }
+        //}
 
         private void OnRadioButtonChecked(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton radioButton)
             {
-                if (this.SelectedValuePath != string.Empty)
-                {
-                    var vv = this.GetChildProperty(radioButton);
-                    this.SetCurrentValue(Selector.SelectedValueProperty, vv);
-                }
-                else
-                {
-                    this.SetCurrentValue(Selector.SelectedValueProperty, radioButton.DataContext);
-                }
+                //if (this.SelectedValuePath != string.Empty)
+                //{
+                //    //var vv = this.GetChildProperty(radioButton);
+                //    //this.SetCurrentValue(Selector.SelectedValueProperty, vv);
+                //    this.SetCurrentValue(Selector.SelectedItemProperty, radioButton.DataContext);
+                //}
+                //else
+                //{
+                //    this.SetCurrentValue(Selector.SelectedValueProperty, radioButton.DataContext);
+                //}
+
+                this.SetCurrentValue(Selector.SelectedItemProperty, radioButton.DataContext);
             }
         }
 
@@ -228,5 +239,4 @@ namespace QSoft.WPF.Control
             return default;
         }
     }
-
 }
