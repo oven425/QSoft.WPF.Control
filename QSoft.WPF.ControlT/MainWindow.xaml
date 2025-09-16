@@ -41,7 +41,6 @@
                     <CheckBox x:Name="checkbox_r3" IsChecked="True">radio3</CheckBox>
                     <TextBlock Text="{Binding SelectedValue, ElementName=rr1}"/>
                 </StackPanel>
-                
             </TabItem>
             <TabItem Header="Dynmaic">
                 <StackPanel>

@@ -68,13 +68,13 @@ namespace QSoft.WPF.Control
                 radioButton.SetBinding(RadioButton.CommandProperty, new Binding()
                 {
                     Source = this,
-                    Path = new PropertyPath(nameof(Command)),
+                    Path = new PropertyPath(nameof(Command), []),
                     Mode = BindingMode.OneWay
                 });
                 radioButton.SetBinding(RadioButton.GroupNameProperty, new Binding()
                 {
                     Source = this,
-                    Path = new PropertyPath(nameof(GroupName)),
+                    Path = new PropertyPath(nameof(GroupName), null),
                     Mode = BindingMode.OneWay
                 });
             }
@@ -144,41 +144,10 @@ namespace QSoft.WPF.Control
             }
         }
 
-        //object? GetChildProperty(RadioButton rbtn)
-        //{
-        //    if (string.IsNullOrEmpty(this.SelectedValuePath))
-        //    {
-        //        return rbtn.DataContext;
-        //    }
-        //    else
-        //    {
-        //        return this.SelectedValue;
-        //        //var pp = typeof(RadioButton).GetProperty(this.SelectedValuePath);
-        //        //var vv = pp?.GetValue(rbtn, null);
-        //        //if(vv == null)
-        //        //{
-        //        //    pp = rbtn.DataContext.GetType().GetProperty(this.SelectedValuePath);
-        //        //    vv = pp?.GetValue(rbtn.DataContext, null);
-        //        //}
-        //        //return vv;
-        //    }
-        //}
-
         private void OnRadioButtonChecked(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton radioButton)
             {
-                //if (this.SelectedValuePath != string.Empty)
-                //{
-                //    //var vv = this.GetChildProperty(radioButton);
-                //    //this.SetCurrentValue(Selector.SelectedValueProperty, vv);
-                //    this.SetCurrentValue(Selector.SelectedItemProperty, radioButton.DataContext);
-                //}
-                //else
-                //{
-                //    this.SetCurrentValue(Selector.SelectedValueProperty, radioButton.DataContext);
-                //}
-
                 this.SetCurrentValue(Selector.SelectedItemProperty, radioButton.DataContext);
             }
         }
