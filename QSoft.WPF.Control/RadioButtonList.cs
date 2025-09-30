@@ -48,7 +48,6 @@ namespace QSoft.WPF.Control
             if(!string.IsNullOrEmpty(this.DisplayMemberPath))
             {
                 var radioButton = new RadioButton();
-                //radioButton.GroupName = this.GroupName;
                 return radioButton;
             }
 
@@ -148,7 +147,11 @@ namespace QSoft.WPF.Control
         {
             if (sender is RadioButton radioButton)
             {
-                this.SetCurrentValue(Selector.SelectedItemProperty, radioButton.DataContext);
+                var obj = this.ItemsSource == null? radioButton:radioButton.DataContext;
+                this.SetCurrentValue(Selector.SelectedItemProperty, obj);
+                var s1 = this.SelectedItem;
+                var s2 = this.SelectedValue;
+                var s3 = this.SelectedIndex;
             }
         }
 
