@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.ControlT", "QSoft
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1\WpfApp1.csproj", "{BE32B3A8-0184-4499-8B83-FF300E53B92F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListView", "QSoft.WPF.TreeListView\QSoft.WPF.TreeListView.csproj", "{F633F868-A2E1-E51B-FD03-E2A96033F227}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListViewT", "QSoft.WPF.TreeListViewT\QSoft.WPF.TreeListViewT.csproj", "{641932F2-CB91-A628-14E9-440172B2FEAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{641932F2-CB91-A628-14E9-440172B2FEAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{641932F2-CB91-A628-14E9-440172B2FEAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{641932F2-CB91-A628-14E9-440172B2FEAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{641932F2-CB91-A628-14E9-440172B2FEAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
