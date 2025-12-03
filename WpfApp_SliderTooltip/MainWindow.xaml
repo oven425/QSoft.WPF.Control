@@ -1,0 +1,45 @@
+﻿<Window x:Class="WpfApp_SliderTooltip.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp_SliderTooltip"
+        d:DataContext="{d:DesignInstance Type=local:MainUI}"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:qbh="clr-namespace:QSoft.WPF.Control.Behaviors"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Tooltip">
+            <Slider x:Name="MySlider"
+                Minimum="0"
+                Maximum="100"
+                Value="50"
+                IsSnapToTickEnabled="True"
+                VerticalAlignment="Center"
+                Margin="20,0,0,0"/>
+        </GroupBox>
+        <GroupBox Header="Adorner" Grid.Row="1">
+            <StackPanel>
+                <TextBlock Text="{Binding Value, ElementName=slider_adorner}"/>
+                <Slider x:Name="slider_adorner" Minimum="0"
+Maximum="100"
+ Value="{Binding SliderValue}" Margin="20,0,0,0">
+                    <i:Interaction.Behaviors>
+                        <qbh:SliderThumbAdornerBehavior>
+                            <qbh:SliderThumbAdornerBehavior.Content>
+                                <TextBlock Background="Red" Text="{Binding SliderValue}"/>
+                            </qbh:SliderThumbAdornerBehavior.Content>
+                        </qbh:SliderThumbAdornerBehavior>
+                    </i:Interaction.Behaviors>
+                </Slider>
+            </StackPanel>
+            
+        </GroupBox>
+    </Grid>
+</Window>

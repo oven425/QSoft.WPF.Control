@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListView", "Q
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListViewT", "QSoft.WPF.TreeListViewT\QSoft.WPF.TreeListViewT.csproj", "{641932F2-CB91-A628-14E9-440172B2FEAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_Validate", "WpfApp_Validate\WpfApp_Validate.csproj", "{062DB706-CCCC-4572-9EAA-133154F034E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_SliderTooltip", "WpfApp_SliderTooltip\WpfApp_SliderTooltip.csproj", "{84DAAB98-5306-436A-85E0-8B1CECE2F34C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{641932F2-CB91-A628-14E9-440172B2FEAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{641932F2-CB91-A628-14E9-440172B2FEAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{641932F2-CB91-A628-14E9-440172B2FEAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062DB706-CCCC-4572-9EAA-133154F034E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062DB706-CCCC-4572-9EAA-133154F034E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062DB706-CCCC-4572-9EAA-133154F034E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062DB706-CCCC-4572-9EAA-133154F034E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84DAAB98-5306-436A-85E0-8B1CECE2F34C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84DAAB98-5306-436A-85E0-8B1CECE2F34C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84DAAB98-5306-436A-85E0-8B1CECE2F34C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84DAAB98-5306-436A-85E0-8B1CECE2F34C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
