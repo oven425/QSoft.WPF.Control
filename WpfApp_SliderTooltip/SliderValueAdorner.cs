@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xaml.Behaviors;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,37 +15,48 @@ namespace QSoft.WPF.Control.Behaviors
 {
     public class SliderThumbAdornerBehavior : Behavior<Slider>
     {
+        //SliderThumbReferenceBehavior 
         SliderValueAdorner? m_Adorner;
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content", typeof(FrameworkElement), typeof(SliderValueAdorner));
+        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content", typeof(UIElement), typeof(SliderValueAdorner));
         public FrameworkElement Content
         {
             get { return (FrameworkElement)GetValue(ContentProperty); }
             set { SetValue(ContentProperty, value); }
         }
 
-        public static readonly DependencyProperty OffsetProperty = DependencyProperty.Register("Offset", typeof(double), typeof(SliderValueAdorner));
-        public double Offset
-        {
-            get { return (double)GetValue(OffsetProperty); }
-            set { SetValue(OffsetProperty, value); }
-        }
+        public double Offset { set; get; } = 0;
         protected override void OnAttached()
         {
             base.OnAttached();
             this.AssociatedObject.Loaded += AssociatedObject_Loaded;
-            
+            this.AssociatedObject.ValueChanged += AssociatedObject_ValueChanged;
+        }
+
+        private void AssociatedObject_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //m_Adorner?.InvalidateArrange();
+
         }
 
         private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
         {
             if(m_Adorner is null)
             {
-                var adornerLayer = AdornerLayer.GetAdornerLayer(this.AssociatedObject);
-                if (adornerLayer != null)
+                if (Content is ContentPresenter presenter)
                 {
-                    m_Adorner = new SliderValueAdorner(this.AssociatedObject, Content);
-                    adornerLayer.Add(m_Adorner);
+                    if (presenter.Content is TextBlock tb)
+                    {
+                        // tb 就是你在 XAML 裡定義的 textt
+                        Debug.WriteLine($"綁定到 TextBlock: {tb.Name}, Text={tb.Text}");
+                        tb.Arrange(new Rect(50,0, tb.DesiredSize.Width, tb.DesiredSize.Height));
+                    }
                 }
+                //var adornerLayer = AdornerLayer.GetAdornerLayer(this.AssociatedObject);
+                //if (adornerLayer != null)
+                //{
+                //    m_Adorner = new SliderValueAdorner(this.AssociatedObject, Content, Offset);
+                //    adornerLayer.Add(m_Adorner);
+                //}
             }
         }
 
@@ -58,28 +70,17 @@ namespace QSoft.WPF.Control.Behaviors
     {
         private readonly Slider _slider;
         readonly FrameworkElement m_Content;
-        public SliderValueAdorner(Slider slider, FrameworkElement content)
+        double m_PreValue = double.NaN;
+        double m_Offset = 0;
+        public SliderValueAdorner(Slider slider, FrameworkElement content, double offset)
             : base(slider)
         {
-
             _slider = slider;
             this.m_Content = content;
             AddVisualChild(m_Content);
-            //    _textBlock = new TextBlock
-            //    {
-            //        Background = Brushes.LightYellow,
-            //        Padding = new Thickness(4),
-            //        FontSize = 12,
-            //        Text = $"{_slider.Value:F0} cm"
-            //    };
+            m_Offset = offset;
+            m_PreValue = _slider.Value;
 
-            //    AddVisualChild(_textBlock);
-
-            _slider.ValueChanged += (s, e) =>
-            {
-                //_textBlock.Text = $"{_slider.Value:F0} cm";
-                InvalidateArrange();
-            };
         }
 
         protected override int VisualChildrenCount => 1;
@@ -91,22 +92,41 @@ namespace QSoft.WPF.Control.Behaviors
             var track = _slider.Template.FindName("PART_Track", _slider) as Track;
             if (track?.Thumb != null)
             {
-                var thumbPos = track.Thumb.TranslatePoint(new Point(0, 0), this);
+                var thumbPos = track.Thumb.TranslatePoint(new Point(track.Thumb.ActualWidth / 2, 0), track);
+                
+                if (_slider.Value < this.m_PreValue)
+                {
+                    thumbPos = track.Thumb.TranslatePoint(new Point(-track.Thumb.ActualWidth, 0), track);
+                }
+                double x = thumbPos.X;
+                this.m_PreValue = _slider.Value;
 
-                double thumbWidth = track.Thumb.ActualWidth;
 
                 m_Content.Measure(finalSize);
                 double textWidth = m_Content.DesiredSize.Width;
 
-                double x = thumbPos.X + (thumbWidth / 2) - (textWidth / 2);
-                double y = thumbPos.Y - m_Content.DesiredSize.Height-3;
+                double y = thumbPos.Y - m_Content.DesiredSize.Height - m_Offset;
 
-                double sliderLeft = 0;
-                double sliderRight = _slider.ActualWidth;
-
-                if (x < sliderLeft) x = sliderLeft;
-                if (x + textWidth > sliderRight) x = sliderRight - textWidth;
-
+                if (track.Thumb.ActualWidth> textWidth)
+                {
+                    var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
+                    //x = x + horoffset;
+                }
+                else
+                {
+                    var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
+                    x = x + horoffset;
+                }
+                    
+                if (x<0)
+                {
+                    x = 0;
+                }
+                else if (x+textWidth > _slider.ActualWidth)
+                {
+                    x = _slider.ActualWidth - textWidth;
+                }
+                System.Diagnostics.Trace.WriteLine($"orgx:{thumbPos.X} x:{x} w:{textWidth}");
                 m_Content.Arrange(new Rect(x, y, textWidth, m_Content.DesiredSize.Height));
             }
 

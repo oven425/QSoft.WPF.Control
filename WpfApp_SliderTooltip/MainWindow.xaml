@@ -7,39 +7,50 @@
         d:DataContext="{d:DesignInstance Type=local:MainUI}"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
+        SnapsToDevicePixels="True"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qbh="clr-namespace:QSoft.WPF.Control.Behaviors"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <GroupBox Header="Tooltip">
-            <Slider x:Name="MySlider"
-                Minimum="0"
-                Maximum="100"
-                Value="50"
-                IsSnapToTickEnabled="True"
-                VerticalAlignment="Center"
-                Margin="20,0,0,0"/>
-        </GroupBox>
-        <GroupBox Header="Adorner" Grid.Row="1">
-            <StackPanel>
-                <TextBlock Text="{Binding Value, ElementName=slider_adorner}"/>
-                <Slider x:Name="slider_adorner" Minimum="0"
+    <ScrollViewer>
+        <Grid Height="600">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Tooltip">
+                <StackPanel>
+                    <TextBlock Background="Red" x:Name="textt" Text="{Binding Value, ElementName=slider_adorner}"/>
+                    <Slider x:Name="MySlider"
+Minimum="0"
 Maximum="100"
- Value="{Binding SliderValue}" Margin="20,0,0,0">
-                    <i:Interaction.Behaviors>
-                        <qbh:SliderThumbAdornerBehavior>
-                            <qbh:SliderThumbAdornerBehavior.Content>
-                                <TextBlock Background="Red" Text="{Binding SliderValue}"/>
-                            </qbh:SliderThumbAdornerBehavior.Content>
-                        </qbh:SliderThumbAdornerBehavior>
-                    </i:Interaction.Behaviors>
-                </Slider>
-            </StackPanel>
-            
-        </GroupBox>
-    </Grid>
+Value="50"
+IsSnapToTickEnabled="True"
+VerticalAlignment="Center"
+Margin="20,0,0,0">
+                        <i:Interaction.Behaviors>
+                            <qbh:SliderThumbReferenceBehavior/>
+                        </i:Interaction.Behaviors>
+                    </Slider>
+                </StackPanel>
+                
+            </GroupBox>
+            <!--<GroupBox Header="Adorner" Grid.Row="1">
+                <StackPanel>
+                    <TextBlock Background="Red" x:Name="textt" Text="{Binding Value, ElementName=slider_adorner}"/>
+                    <Slider x:Name="slider_adorner" Minimum="0" Maximum="100" Value="{Binding SliderValue}" Margin="20,0,0,0">
+                        <i:Interaction.Behaviors>
+                            <qbh:SliderThumbAdornerBehavior>
+                                <qbh:SliderThumbAdornerBehavior.Content>
+                                    --><!--<TextBlock Background="Red"  Text="A"/>--><!--
+                                    <ContentPresenter Content="{x:Reference Name=textt}"/>
+                                </qbh:SliderThumbAdornerBehavior.Content>
+                            </qbh:SliderThumbAdornerBehavior>
+                        </i:Interaction.Behaviors>
+                    </Slider>
+                </StackPanel>
+
+            </GroupBox>-->
+        </Grid>
+
+    </ScrollViewer>
 </Window>
