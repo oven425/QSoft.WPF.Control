@@ -34,7 +34,7 @@ namespace QSoft.WPF.Control.Behaviors
 
         private void AssociatedObject_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //m_Adorner?.InvalidateArrange();
+            m_Adorner?.InvalidateArrange();
 
         }
 
@@ -42,21 +42,13 @@ namespace QSoft.WPF.Control.Behaviors
         {
             if(m_Adorner is null)
             {
-                if (Content is ContentPresenter presenter)
+
+                var adornerLayer = AdornerLayer.GetAdornerLayer(this.AssociatedObject);
+                if (adornerLayer != null)
                 {
-                    if (presenter.Content is TextBlock tb)
-                    {
-                        // tb 就是你在 XAML 裡定義的 textt
-                        Debug.WriteLine($"綁定到 TextBlock: {tb.Name}, Text={tb.Text}");
-                        tb.Arrange(new Rect(50,0, tb.DesiredSize.Width, tb.DesiredSize.Height));
-                    }
+                    m_Adorner = new SliderValueAdorner(this.AssociatedObject, Content, Offset);
+                    adornerLayer.Add(m_Adorner);
                 }
-                //var adornerLayer = AdornerLayer.GetAdornerLayer(this.AssociatedObject);
-                //if (adornerLayer != null)
-                //{
-                //    m_Adorner = new SliderValueAdorner(this.AssociatedObject, Content, Offset);
-                //    adornerLayer.Add(m_Adorner);
-                //}
             }
         }
 

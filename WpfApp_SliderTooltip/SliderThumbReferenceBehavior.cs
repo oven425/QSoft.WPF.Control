@@ -48,7 +48,7 @@ namespace QSoft.WPF.Control.Behaviors
 
 
                 //m_Content.Measure(finalSize);
-                double textWidth = m_Content.DesiredSize.Width;
+                double textWidth = m_Content.ActualWidth;
 
                 double y = thumbPos.Y - m_Content.DesiredSize.Height;
 
@@ -62,7 +62,7 @@ namespace QSoft.WPF.Control.Behaviors
                     var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
                     x = x + horoffset;
                 }
-
+                x = x + 20;
                 if (x < 0)
                 {
                     x = 0;
@@ -73,18 +73,13 @@ namespace QSoft.WPF.Control.Behaviors
                 }
                 System.Diagnostics.Trace.WriteLine($"orgx:{thumbPos.X} x:{x} w:{textWidth}");
                 //m_Content.Arrange(new Rect(x, y, textWidth, m_Content.DesiredSize.Height));
+                m_Content.Margin = new Thickness(x, 0, 0, 0);
             }
         }
 
         private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Content is ContentPresenter presenter)
-            {
-                if (presenter.Content is FrameworkElement fe)
-                {
-                    this.m_Content = fe;
-                }
-            }
+            this.m_Content = this.Content;
         }
 
         protected override void OnDetaching()

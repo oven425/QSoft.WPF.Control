@@ -11,45 +11,40 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qbh="clr-namespace:QSoft.WPF.Control.Behaviors"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary Source="/Dictionary1.xaml"/>
+    </Window.Resources>
     <ScrollViewer>
-        <Grid Height="600">
+        <Grid Height="300">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <GroupBox Header="Tooltip">
                 <StackPanel>
-                    <TextBlock Background="Red" x:Name="textt" Text="{Binding Value, ElementName=slider_adorner}"/>
-                    <Slider x:Name="MySlider"
-Minimum="0"
-Maximum="100"
-Value="50"
-IsSnapToTickEnabled="True"
-VerticalAlignment="Center"
-Margin="20,0,0,0">
+                    <TextBlock Background="Red" HorizontalAlignment="Left" x:Name="textt" Text="ABCDE"/>
+                    <Slider x:Name="MySlider" Minimum="0" Maximum="100" Value="{Binding S1}" Margin="20,0,0,0">
                         <i:Interaction.Behaviors>
-                            <qbh:SliderThumbReferenceBehavior/>
+                            <qbh:SliderThumbReferenceBehavior Content="{x:Reference Name=textt}"/>
                         </i:Interaction.Behaviors>
                     </Slider>
                 </StackPanel>
                 
             </GroupBox>
-            <!--<GroupBox Header="Adorner" Grid.Row="1">
+            <GroupBox Header="Adorner" Grid.Row="1">
                 <StackPanel>
-                    <TextBlock Background="Red" x:Name="textt" Text="{Binding Value, ElementName=slider_adorner}"/>
                     <Slider x:Name="slider_adorner" Minimum="0" Maximum="100" Value="{Binding SliderValue}" Margin="20,0,0,0">
                         <i:Interaction.Behaviors>
                             <qbh:SliderThumbAdornerBehavior>
                                 <qbh:SliderThumbAdornerBehavior.Content>
-                                    --><!--<TextBlock Background="Red"  Text="A"/>--><!--
-                                    <ContentPresenter Content="{x:Reference Name=textt}"/>
+                                    <TextBlock Background="Red"  Text="ABCDE"/>
                                 </qbh:SliderThumbAdornerBehavior.Content>
                             </qbh:SliderThumbAdornerBehavior>
                         </i:Interaction.Behaviors>
                     </Slider>
                 </StackPanel>
 
-            </GroupBox>-->
+            </GroupBox>
         </Grid>
 
     </ScrollViewer>

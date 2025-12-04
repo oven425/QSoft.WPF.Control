@@ -41,6 +41,20 @@ namespace WpfApp_SliderTooltip
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        int m_S1;
+        public int S1
+        {
+            get => m_S1;
+            set
+            {
+                if (m_S1 != value)
+                {
+                    m_S1 = value;
+                    OnPropertyChanged(nameof(S1));
+                }
+            }
+        }
+
         private int _sliderValue;
         public int SliderValue
         {
