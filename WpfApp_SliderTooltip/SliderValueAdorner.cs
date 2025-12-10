@@ -15,7 +15,6 @@ namespace QSoft.WPF.Control.Behaviors
 {
     public class SliderThumbAdornerBehavior : Behavior<Slider>
     {
-        //SliderThumbReferenceBehavior 
         SliderValueAdorner? m_Adorner;
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content", typeof(UIElement), typeof(SliderValueAdorner));
         public FrameworkElement Content
@@ -46,7 +45,8 @@ namespace QSoft.WPF.Control.Behaviors
                 var adornerLayer = AdornerLayer.GetAdornerLayer(this.AssociatedObject);
                 if (adornerLayer != null)
                 {
-                    m_Adorner = new SliderValueAdorner(this.AssociatedObject, Content, Offset);
+                    m_Adorner = new SliderValueAdorner(this.AssociatedObject, Content, Offset)
+                        .Init();
                     adornerLayer.Add(m_Adorner);
                 }
             }
@@ -58,68 +58,80 @@ namespace QSoft.WPF.Control.Behaviors
             base.OnDetaching();
         }
     }
-    public class SliderValueAdorner : Adorner
+    public class SliderValueAdorner(Slider slider, FrameworkElement content, double offset) : Adorner(slider)
     {
-        private readonly Slider _slider;
-        readonly FrameworkElement m_Content;
-        double m_PreValue = double.NaN;
-        double m_Offset = 0;
-        public SliderValueAdorner(Slider slider, FrameworkElement content, double offset)
-            : base(slider)
-        {
-            _slider = slider;
-            this.m_Content = content;
-            AddVisualChild(m_Content);
-            m_Offset = offset;
-            m_PreValue = _slider.Value;
+        //private readonly Slider _slider;
+        //readonly FrameworkElement m_Content;
+        double m_PreValue = slider.Value;
+        //double m_Offset = 0;
+        //public SliderValueAdorner(Slider slider, FrameworkElement content, double offset)
+        //    : base(slider)
+        //{
+        //    _slider = slider;
+        //    this.m_Content = content;
+        //    AddVisualChild(m_Content);
+        //    m_Offset = offset;
+        //    m_PreValue = _slider.Value;
 
+        //}
+        public SliderValueAdorner Init()
+        {
+            AddVisualChild(content);
+            return this;
         }
 
+
         protected override int VisualChildrenCount => 1;
-        protected override Visual GetVisualChild(int index) => m_Content;
+        protected override Visual GetVisualChild(int index) => content;
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            if(m_Content == null) return finalSize;
-            var track = _slider.Template.FindName("PART_Track", _slider) as Track;
+            if(content == null) return finalSize;
+            var track = slider.Template.FindName("PART_Track", slider) as Track;
             if (track?.Thumb != null)
             {
                 var thumbPos = track.Thumb.TranslatePoint(new Point(track.Thumb.ActualWidth / 2, 0), track);
                 
-                if (_slider.Value < this.m_PreValue)
+                if (slider.Value < this.m_PreValue)
                 {
                     thumbPos = track.Thumb.TranslatePoint(new Point(-track.Thumb.ActualWidth, 0), track);
                 }
                 double x = thumbPos.X;
-                this.m_PreValue = _slider.Value;
-
-
-                m_Content.Measure(finalSize);
-                double textWidth = m_Content.DesiredSize.Width;
-
-                double y = thumbPos.Y - m_Content.DesiredSize.Height - m_Offset;
-
-                if (track.Thumb.ActualWidth> textWidth)
+                if (slider.Value < this.m_PreValue)
                 {
-                    var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
-                    //x = x + horoffset;
+                    x = x + track.Thumb.ActualWidth/2;
                 }
-                else
-                {
-                    var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
-                    x = x + horoffset;
-                }
-                    
+
+                content.Measure(finalSize);
+                double textWidth = content.DesiredSize.Width;
+
+                double y = thumbPos.Y - content.DesiredSize.Height - offset;
+
+                //if (track.Thumb.ActualWidth> textWidth)
+                //{
+                //    var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
+                //    x = x + horoffset;
+                //}
+                //else
+                //{
+                //    var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
+                //    x = x + horoffset;
+                //}
+
+                var horoffset = (track.Thumb.ActualWidth - textWidth) / 2;
+                x = x + horoffset;
+
+                this.m_PreValue = slider.Value;
                 if (x<0)
                 {
                     x = 0;
                 }
-                else if (x+textWidth > _slider.ActualWidth)
+                else if (x+textWidth > slider.ActualWidth)
                 {
-                    x = _slider.ActualWidth - textWidth;
+                    x = slider.ActualWidth - textWidth;
                 }
-                System.Diagnostics.Trace.WriteLine($"orgx:{thumbPos.X} x:{x} w:{textWidth}");
-                m_Content.Arrange(new Rect(x, y, textWidth, m_Content.DesiredSize.Height));
+                System.Diagnostics.Trace.WriteLine($"orgx:{thumbPos.X} x:{x} tw:{track.Thumb.ActualWidth} w:{textWidth}");
+                content.Arrange(new Rect(x, y, textWidth, content.DesiredSize.Height));
             }
 
             return finalSize;
