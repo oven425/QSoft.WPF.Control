@@ -140,6 +140,44 @@
                 <StackPanel>
                     <GroupBox Header="Radiolist">
                         <StackPanel>
+                            <TextBox Text="{Binding SelectedValue, ElementName=rr11}"/>
+                            <qcontrol:RadioButtonList Command="{Binding DelayCommand}" x:Name="rr11" SelectedIndex="0"  ItemsSource="{Binding Peoples}" SelectedValuePath="Address.Auth.Account" Height="35">
+                                <qcontrol:RadioButtonList.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Rectangle Width="10" Height="10" Fill="LightGray" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                            <Rectangle Width="10" Height="10" Fill="LightGray" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                                            <Rectangle Width="10" Height="10" Fill="LightGray" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                            <Rectangle Width="10" Height="10" Fill="LightGray" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Grid>
+                                        
+                                    </DataTemplate>
+                                </qcontrol:RadioButtonList.ItemTemplate>
+                                <qcontrol:RadioButtonList.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource radiobtn}" TargetType="RadioButton">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                    </Style>
+                                </qcontrol:RadioButtonList.ItemContainerStyle>
+                                <qcontrol:RadioButtonList.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
+                                    </ItemsPanelTemplate>
+                                </qcontrol:RadioButtonList.ItemsPanel>
+                                
+                            </qcontrol:RadioButtonList>
+                        </StackPanel>
+                    </GroupBox>
+
+                </StackPanel>
+
+            </TabItem>
+
+            <TabItem Header="Peoples">
+                <StackPanel>
+                    <GroupBox Header="Radiolist">
+                        <StackPanel>
                             <TextBox Text="{Binding SelectedValue, ElementName=rr10}"/>
                             <qcontrol:RadioButtonList Command="{Binding DelayCommand}" x:Name="rr10" SelectedIndex="0"  ItemsSource="{Binding Peoples}" SelectedValuePath="Address.Auth.Account" DisplayMemberPath="Name" Height="35">
                                 <qcontrol:RadioButtonList.ItemsPanel>
