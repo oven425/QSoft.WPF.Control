@@ -16,7 +16,7 @@
         <ResourceDictionary Source="/RadioRoundButton.xaml"/>
     </Window.Resources>
     <StackPanel>
-        <TabControl SelectedIndex="0">
+        <TabControl SelectedIndex="1">
             <TabItem Header="Fix">
                 <StackPanel>
                     <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
