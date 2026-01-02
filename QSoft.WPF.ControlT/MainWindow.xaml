@@ -16,8 +16,8 @@
         <ResourceDictionary Source="/RadioRoundButton.xaml"/>
     </Window.Resources>
     <StackPanel>
-        <TabControl SelectedIndex="1">
-            <TabItem Header="Fix">
+        <TabControl SelectedIndex="2">
+            <TabItem Header="Fixed">
                 <StackPanel>
                     <qpanel:FlexPanel FlexDirection="Column" Gap="5" AlignItems="Stretch">
                         <TextBox Text="{Binding Fix, UpdateSourceTrigger=PropertyChanged}"/>
@@ -48,7 +48,8 @@
                     <qcontrol:RadioButtonList ItemsSource="{Binding Items}"  SelectedItem="{Binding Item}" Height="35">
                         <qcontrol:RadioButtonList.ItemTemplate>
                             <DataTemplate>
-                                <RadioButton Command="{Binding DataContext.SetItemCommand, ElementName=local}" GroupName="item" Content="{Binding}"/>
+                                <TextBlock Text="{Binding}"/>
+                                <!--<RadioButton Command="{Binding DataContext.SetItemCommand, ElementName=local}" GroupName="item" Content="{Binding}"/>-->
                             </DataTemplate>
                         </qcontrol:RadioButtonList.ItemTemplate>
                         <qcontrol:RadioButtonList.ItemsPanel>
@@ -61,13 +62,9 @@
             </TabItem>
             <TabItem Header="DataItem">
                 <StackPanel>
-                    <ComboBox SelectedItem="{Binding DataItem}" ItemsSource="{Binding DataItems}"/>
-                    <qcontrol:RadioButtonList ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItem}" Height="35">
-                        <qcontrol:RadioButtonList.ItemTemplate>
-                            <DataTemplate>
-                                <RadioButton Command="{Binding DataContext.SetDataItemCommand, ElementName=local}" GroupName="dataitem" Content="{Binding Name}"/>
-                            </DataTemplate>
-                        </qcontrol:RadioButtonList.ItemTemplate>
+                    <ComboBox x:Name="cc1" SelectedIndex="1" ItemsSource="{Binding DataItems}"/>
+                    <qcontrol:RadioButtonList ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedItem="{Binding SelectedItem, ElementName=cc1}" Height="35">
+
                         <qcontrol:RadioButtonList.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
@@ -79,18 +76,6 @@
             <TabItem Header="DataItem by Id">
                 <StackPanel>
                     <TextBox Text="{Binding DataItemId, UpdateSourceTrigger=PropertyChanged}"/>
-                    <!--<qcontrol:RadioButtonList Command="{Binding SetDataItemCommand}" ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
-                        <qcontrol:RadioButtonList.ItemTemplate>
-                            <DataTemplate>
-                                <RadioButton Command="{Binding DataContext.SetDataItemCommand, ElementName=local}" GroupName="dataitem" Content="{Binding Name}"/>
-                            </DataTemplate>
-                        </qcontrol:RadioButtonList.ItemTemplate>
-                        <qcontrol:RadioButtonList.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <qpanel:FlexPanel JustifyContent="SpaceAround" Gap="10"/>
-                            </ItemsPanelTemplate>
-                        </qcontrol:RadioButtonList.ItemsPanel>
-                    </qcontrol:RadioButtonList>-->
                     <qcontrol:RadioButtonList Command="{Binding SetDataItemCommand}" ItemsSource="{Binding DataItems}" SelectionChanged="RadioButtonList_SelectionChanged" SelectedValue="{Binding DataItemId}" SelectedValuePath="Id" Height="35">
                         <qcontrol:RadioButtonList.ItemTemplate>
                             <DataTemplate>
