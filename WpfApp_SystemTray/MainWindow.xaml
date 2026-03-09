@@ -1,0 +1,31 @@
+﻿<Window x:Class="WpfApp_SystemTray.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp_SystemTray"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
+        Title="MainWindow" Height="450" Width="800">
+    
+    <Grid>
+        <StackPanel>
+            <Button x:Name="button_create" Click="button_create_Click">add</Button>
+            <Button x:Name="button_remove" Click="button_remove_Click">Remove</Button>
+            
+            <ComboBox x:Name="combobox_ico" SelectionChanged="combobox_ico_SelectionChanged">
+                <ComboBoxItem>
+                    Red
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    Green
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    Blue
+                </ComboBoxItem>
+            </ComboBox>
+            <Button x:Name="button_showballonmsg" Click="button_showballonmsg_Click">Ballon Message</Button>
+        </StackPanel>
+    </Grid>
+</Window>
