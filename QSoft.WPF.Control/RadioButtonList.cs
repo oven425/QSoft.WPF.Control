@@ -32,6 +32,7 @@ namespace QSoft.WPF.Control
             get => (ICommand)GetValue(ICommandProperty);
             set => SetValue(ICommandProperty, value);
         }
+
         static RadioButtonList()
         {
             //DefaultStyleKeyProperty.OverrideMetadata(typeof(RadioButtonList), new FrameworkPropertyMetadata(typeof(RadioButtonList)));
@@ -44,14 +45,8 @@ namespace QSoft.WPF.Control
 
         protected override DependencyObject GetContainerForItemOverride()
         {
+            //return base.GetContainerForItemOverride();
             return new RadioButton();
-            if(!string.IsNullOrEmpty(this.DisplayMemberPath))
-            {
-                var radioButton = new RadioButton();
-                return radioButton;
-            }
-
-            return  base.GetContainerForItemOverride();
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
@@ -112,12 +107,6 @@ namespace QSoft.WPF.Control
             {
                 var control = VisualTreeHelper.GetChild(container, 0);
                 var radioButton= control as RadioButton;
-                //if(radioButton == null)
-                //{
-                //    radioButton = new RadioButton();
-                //    radioButton.Content = control;
-                //    radioButton.DataContext = container.DataContext;
-                //}
 
                 if (radioButton != null)
                 {
@@ -125,20 +114,6 @@ namespace QSoft.WPF.Control
                     {
                         radioButton.GroupName = this.GroupName;
                     }
-                    //radioButton.Checked -= OnRadioButtonChecked;
-                    //radioButton.Checked += OnRadioButtonChecked;
-
-                    //if (this.SelectedValue != null && this.SelectedValue.Equals(GetChildProperty(radioButton)))
-                    //{
-                    //    radioButton.IsChecked = true;
-                    //}
-
-                    //radioButton.SetBinding(ToggleButton.IsCheckedProperty, new Binding
-                    //{
-                    //    Path = new PropertyPath("IsSelected"),
-                    //    RelativeSource = new RelativeSource(RelativeSourceMode.Self),
-                    //    Mode = BindingMode.TwoWay
-                    //});
                 }
             }
         }
@@ -149,9 +124,7 @@ namespace QSoft.WPF.Control
             {
                 var obj = this.ItemsSource == null? radioButton:radioButton.DataContext;
                 this.SetCurrentValue(Selector.SelectedItemProperty, obj);
-                var s1 = this.SelectedItem;
-                var s2 = this.SelectedValue;
-                var s3 = this.SelectedIndex;
+
             }
         }
 
@@ -211,4 +184,5 @@ namespace QSoft.WPF.Control
             return default;
         }
     }
+
 }
