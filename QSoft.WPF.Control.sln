@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11620.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.Control", "QSoft.WPF.Control\QSoft.WPF.Control.csproj", "{65A7A891-1522-4043-B8CA-BDA781BAC75B}"
 EndProject
@@ -19,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_SliderTooltip", "Wpf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_SystemTray", "WpfApp_SystemTray\WpfApp_SystemTray.csproj", "{07F8BB13-2434-493E-A5F2-A7EF6047506B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp_IOC", "ConsoleApp_IOC\ConsoleApp_IOC.csproj", "{E9015BA2-7AB2-4E1B-8D06-DD0B05C652CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_Style", "WpfApp_Style\WpfApp_Style.csproj", "{D0A64812-DF7D-4CF5-BA6A-51A6C40E82D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF_ComboboxT", "WPF_ComboboxT\WPF_ComboboxT.csproj", "{789F9302-5910-4D8D-9E67-A1682D9A3116}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +61,14 @@ Global
 		{07F8BB13-2434-493E-A5F2-A7EF6047506B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07F8BB13-2434-493E-A5F2-A7EF6047506B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07F8BB13-2434-493E-A5F2-A7EF6047506B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9015BA2-7AB2-4E1B-8D06-DD0B05C652CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9015BA2-7AB2-4E1B-8D06-DD0B05C652CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9015BA2-7AB2-4E1B-8D06-DD0B05C652CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9015BA2-7AB2-4E1B-8D06-DD0B05C652CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0A64812-DF7D-4CF5-BA6A-51A6C40E82D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0A64812-DF7D-4CF5-BA6A-51A6C40E82D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0A64812-DF7D-4CF5-BA6A-51A6C40E82D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0A64812-DF7D-4CF5-BA6A-51A6C40E82D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{789F9302-5910-4D8D-9E67-A1682D9A3116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{789F9302-5910-4D8D-9E67-A1682D9A3116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{789F9302-5910-4D8D-9E67-A1682D9A3116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{789F9302-5910-4D8D-9E67-A1682D9A3116}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace QSoft.WPF.TreeListViewT
+{
+    /// <summary>
+    /// Listview_Average.xaml 的互動邏輯
+    /// </summary>
+    public partial class Listview_Average : UserControl
+    {
+        public Listview_Average()
+        {
+            InitializeComponent();
+        }
+
+        private void listview_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var listview = (ListView)sender;
+            var gridview = listview.View as GridView;
+            var w = listview.ActualWidth / 3;
+            foreach(GridViewColumn oo in gridview.Columns)
+            {
+                
+                oo.Width = w;
+            }
+        }
+    }
+
+    
+}
