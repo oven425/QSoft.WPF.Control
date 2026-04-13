@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace WpfApp_Validate
+namespace QSoft.WPF.ShowMoreT
 {
     /// <summary>
     /// Interaction logic for App.xaml
