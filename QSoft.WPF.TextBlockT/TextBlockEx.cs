@@ -10,21 +10,21 @@ namespace QSoft.WPF.TextBlockT
 {
     public class TextBlockEx : FrameworkElement
     {
-        private const double IndentUnit  = 16.0;
-        private const double SymbolWidth = 20.0;
-        private const double RowSpacing  = 3.0;
+        private const double IndentUnit  = 0.0;
+        private const double SymbolWidth = 0.0;
+        private const double RowSpacing  = 0.0;
 
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register(nameof(Items),
-                typeof(ObservableCollection<BulletItem>), typeof(TextBlockEx),
+                typeof(ObservableCollection<TextBlockExElement>), typeof(TextBlockEx),
                 new FrameworkPropertyMetadata(null,
                     FrameworkPropertyMetadataOptions.AffectsMeasure |
                     FrameworkPropertyMetadataOptions.AffectsRender,
                     OnItemsChanged));
 
-        public ObservableCollection<BulletItem> Items
+        public ObservableCollection<TextBlockExElement> Items
         {
-            get => (ObservableCollection<BulletItem>)GetValue(ItemsProperty);
+            get => (ObservableCollection<TextBlockExElement>)GetValue(ItemsProperty);
             set => SetValue(ItemsProperty, value);
         }
 
@@ -65,21 +65,20 @@ namespace QSoft.WPF.TextBlockT
 
         public TextBlockEx()
         {
-            Items = new ObservableCollection<BulletItem>();
+            Items = new ObservableCollection<TextBlockExElement>();
         }
 
         protected override IEnumerator LogicalChildren
-            => (Items ?? new ObservableCollection<BulletItem>()).GetEnumerator();
-
+            => (Items ?? new ObservableCollection<TextBlockExElement>()).GetEnumerator();
         private static void OnItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctrl = (TextBlockEx)d;
-            if (e.OldValue is ObservableCollection<BulletItem> old)
+            if (e.OldValue is ObservableCollection<TextBlockExElement> old)
             {
                 old.CollectionChanged -= ctrl.OnCollectionChanged;
                 foreach (var item in old) ctrl.RemoveLogicalChild(item);
             }
-            if (e.NewValue is ObservableCollection<BulletItem> nw)
+            if (e.NewValue is ObservableCollection<TextBlockExElement> nw)
             {
                 foreach (var item in nw) ctrl.AddLogicalChild(item);
                 nw.CollectionChanged += ctrl.OnCollectionChanged;
@@ -89,9 +88,9 @@ namespace QSoft.WPF.TextBlockT
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
-                foreach (BulletItem item in e.OldItems) RemoveLogicalChild(item);
+                foreach (TextBlockExElement item in e.OldItems) RemoveLogicalChild(item);
             if (e.NewItems != null)
-                foreach (BulletItem item in e.NewItems) AddLogicalChild(item);
+                foreach (TextBlockExElement item in e.NewItems) AddLogicalChild(item);
 
             InvalidateMeasure();
             InvalidateVisual();
@@ -103,9 +102,7 @@ namespace QSoft.WPF.TextBlockT
             catch { return 1.0; }
         }
 
-        // fontSize 為 null 時使用 item.FontSize
-        private FormattedText MakeText(BulletItem item, string text, double maxWidth,
-                                       double? fontSize = null)
+        private FormattedText MakeText(TextBlockExElement item, string text, double maxWidth, double? fontSize = null)
         {
             var ft = new FormattedText(
                 string.IsNullOrEmpty(text) ? " " : text,
@@ -115,7 +112,7 @@ namespace QSoft.WPF.TextBlockT
                 fontSize ?? item.FontSize,
                 item.Foreground,
                 PixelsPerDip());
-
+           
             ft.MaxTextWidth = Math.Max(1.0, maxWidth);
             return ft;
         }
@@ -125,7 +122,7 @@ namespace QSoft.WPF.TextBlockT
             var items = Items;
             if (items is null || items.Count == 0) return Size.Empty;
 
-            double avW = double.IsInfinity(availableSize.Width) ? 600 : availableSize.Width;
+            double avW = availableSize.Width;
             double y = 0, maxW = 0;
 
             foreach (var item in items)
@@ -187,11 +184,14 @@ namespace QSoft.WPF.TextBlockT
                 var    item   = items[i];
                 double indent = item.IndentLevel * IndentUnit;
                 double txtX   = indent + SymbolWidth;
-                var    symFt  = MakeText(item, item.Symbol, SymbolWidth,
+                var    symFt  = MakeText(item, item.Symbol, avW - txtX,
                                          item.SymbolFontSize ?? item.FontSize);
+                txtX = symFt.WidthIncludingTrailingWhitespace;
                 var    txtFt  = MakeText(item, item.Text,   avW - txtX);
-
-                dc.DrawText(symFt, new Point(indent, y));
+                var geometry = txtFt.BuildHighlightGeometry(new Point(0, 0));
+                var lineCount = (int)Math.Ceiling(txtFt.Height / 20);
+                var symFt_y = (txtFt.Height - symFt.Height) / 2;
+                dc.DrawText(symFt, new Point(indent, symFt_y));
 
                 if (i == lastIdx && hasMore)
                 {

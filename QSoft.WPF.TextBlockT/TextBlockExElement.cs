@@ -1,13 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
 namespace QSoft.WPF.TextBlockT
 {
-    public class BulletItem : FrameworkContentElement
+    public class Symbol:DependencyObject
+    {
+        public static readonly DependencyProperty TextProperty =
+    DependencyProperty.Register(nameof(Text), typeof(string),
+        typeof(Symbol), new PropertyMetadata(""));
+
+        public string Text
+        {
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
+        }
+    }
+    public class TextBlockExElement : FrameworkContentElement
     {
         public static readonly DependencyProperty SymbolProperty =
-            DependencyProperty.Register(nameof(Symbol), typeof(string),
-                typeof(BulletItem), new PropertyMetadata("•"));
+    DependencyProperty.Register(nameof(Symbol), typeof(string),
+        typeof(TextBlockExElement), new PropertyMetadata(""));
 
         public string Symbol
         {
@@ -15,9 +32,11 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(SymbolProperty, value);
         }
 
+
+
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(nameof(Text), typeof(string),
-                typeof(BulletItem), new PropertyMetadata(string.Empty));
+                typeof(TextBlockExElement), new PropertyMetadata(string.Empty));
 
         public string Text
         {
@@ -27,7 +46,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty IndentLevelProperty =
             DependencyProperty.Register(nameof(IndentLevel), typeof(int),
-                typeof(BulletItem), new PropertyMetadata(0));
+                typeof(TextBlockExElement), new PropertyMetadata(0));
 
         public int IndentLevel
         {
@@ -37,7 +56,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty FontWeightProperty =
             DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(FontWeights.Normal,
                     FrameworkPropertyMetadataOptions.Inherits));
 
@@ -49,9 +68,9 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register(nameof(FontSize), typeof(double),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(12.0,
-                    FrameworkPropertyMetadataOptions.Inherits));
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsRender));
 
         public double FontSize
         {
@@ -59,10 +78,9 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontSizeProperty, value);
         }
 
-        // Symbol 專屬字號，未設定時跟隨 FontSize
         public static readonly DependencyProperty SymbolFontSizeProperty =
             DependencyProperty.Register(nameof(SymbolFontSize), typeof(double?),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(null,
                     FrameworkPropertyMetadataOptions.Inherits));
 
@@ -74,7 +92,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(nameof(FontFamily), typeof(FontFamily),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(new FontFamily("Segoe UI"),
                     FrameworkPropertyMetadataOptions.Inherits));
 
@@ -86,7 +104,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty FontStyleProperty =
             DependencyProperty.Register(nameof(FontStyle), typeof(FontStyle),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(FontStyles.Normal,
                     FrameworkPropertyMetadataOptions.Inherits));
 
@@ -98,7 +116,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty FontStretchProperty =
             DependencyProperty.Register(nameof(FontStretch), typeof(FontStretch),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(FontStretches.Normal,
                     FrameworkPropertyMetadataOptions.Inherits));
 
@@ -110,7 +128,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty ForegroundProperty =
             DependencyProperty.Register(nameof(Foreground), typeof(Brush),
-                typeof(BulletItem),
+                typeof(TextBlockExElement),
                 new FrameworkPropertyMetadata(Brushes.Black,
                     FrameworkPropertyMetadataOptions.Inherits));
 
@@ -119,5 +137,7 @@ namespace QSoft.WPF.TextBlockT
             get => (Brush)GetValue(ForegroundProperty);
             set => SetValue(ForegroundProperty, value);
         }
+
     }
+
 }
