@@ -10,9 +10,8 @@ namespace QSoft.WPF.TextBlockT
 {
     public class TextBlockEx : FrameworkElement
     {
-        private const double IndentUnit  = 0.0;
-        private const double SymbolWidth = 0.0;
-        private const double RowSpacing  = 0.0;
+        private const double IndentUnit = 0.0;
+        private const double RowSpacing = 0.0;
 
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register(nameof(Items),
@@ -53,7 +52,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(nameof(FontFamily), typeof(FontFamily), typeof(TextBlockEx),
-                new FrameworkPropertyMetadata(new FontFamily("Segoe UI"),
+                new FrameworkPropertyMetadata(new FontFamily("Arial"),
                     FrameworkPropertyMetadataOptions.AffectsMeasure |
                     FrameworkPropertyMetadataOptions.AffectsRender));
 
@@ -70,6 +69,7 @@ namespace QSoft.WPF.TextBlockT
 
         protected override IEnumerator LogicalChildren
             => (Items ?? new ObservableCollection<TextBlockExElement>()).GetEnumerator();
+
         private static void OnItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctrl = (TextBlockEx)d;
@@ -112,9 +112,47 @@ namespace QSoft.WPF.TextBlockT
                 fontSize ?? item.FontSize,
                 item.Foreground,
                 PixelsPerDip());
-           
+
             ft.MaxTextWidth = Math.Max(1.0, maxWidth);
             return ft;
+        }
+
+        private FormattedText MakeSymbolText(Symbol sym, double maxWidth)
+        {
+            var ft = new FormattedText(
+                string.IsNullOrEmpty(sym.Text) ? " " : sym.Text,
+                CultureInfo.CurrentUICulture,
+                FlowDirection.LeftToRight,
+                new Typeface(sym.FontFamily, sym.FontStyle, sym.FontWeight, sym.FontStretch),
+                sym.FontSize,
+                sym.Foreground,
+                PixelsPerDip());
+
+            ft.MaxTextWidth = Math.Max(1.0, maxWidth);
+            return ft;
+        }
+
+        private double GetSymbolTotalWidth(TextBlockExElement item, double availableWidth)
+        {
+            var sym = item.Symbol;
+            if (sym == null || string.IsNullOrEmpty(sym.Text)) return 0;
+
+            double padH    = sym.Padding.Left + sym.Padding.Right;
+            double avail   = Math.Max(1.0, availableWidth - padH);
+            var    symFt   = MakeSymbolText(sym, avail);
+            return sym.Padding.Left + symFt.WidthIncludingTrailingWhitespace + sym.Padding.Right;
+        }
+
+        private static double GetSymbolOffsetY(Symbol sym, double symTextH, double rowContentH)
+        {
+            double extra = rowContentH - symTextH - sym.Padding.Top - sym.Padding.Bottom;
+            return sym.VerticalAlignment switch
+            {
+                VerticalAlignment.Center  => sym.Padding.Top + Math.Max(0, extra / 2.0),
+                VerticalAlignment.Bottom  => sym.Padding.Top + Math.Max(0, extra),
+                VerticalAlignment.Stretch => sym.Padding.Top + Math.Max(0, extra / 2.0),
+                _                         => sym.Padding.Top,   // Top（預設）
+            };
         }
 
         protected override Size MeasureOverride(Size availableSize)
@@ -122,15 +160,23 @@ namespace QSoft.WPF.TextBlockT
             var items = Items;
             if (items is null || items.Count == 0) return Size.Empty;
 
-            double avW = availableSize.Width;
-            double y = 0, maxW = 0;
+            double avW  = availableSize.Width;
+            double y    = 0;
+            double maxW = 0;
 
             foreach (var item in items)
             {
-                double txtX = item.IndentLevel * IndentUnit + SymbolWidth;
-                var ft = MakeText(item, item.Text, avW - txtX);
-                y    += ft.Height + RowSpacing;
-                maxW  = Math.Max(maxW, txtX + ft.Width);
+                double indent   = item.IndentLevel * IndentUnit;
+                double itemPadH = item.Padding.Left + item.Padding.Right;
+                double itemPadV = item.Padding.Top  + item.Padding.Bottom;
+                double symTotalW = GetSymbolTotalWidth(item, avW - indent - itemPadH);
+
+                double txtX    = indent + item.Padding.Left + symTotalW;
+                double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
+                var    txtFt   = MakeText(item, item.Text, txtAvail);
+
+                y    += txtFt.Height + itemPadV + RowSpacing;
+                maxW  = Math.Max(maxW, txtX + txtFt.Width + item.Padding.Right);
             }
             if (y > 0) y -= RowSpacing;
 
@@ -144,8 +190,8 @@ namespace QSoft.WPF.TextBlockT
             var items = Items;
             if (items is null || items.Count == 0) return;
 
-            double avW     = ActualWidth;
-            double avH     = ActualHeight;
+            double avW       = ActualWidth;
+            double avH       = ActualHeight;
             int    lastIdx   = -1;
             bool   isPartial = false;
             double partialH  = 0;
@@ -154,24 +200,36 @@ namespace QSoft.WPF.TextBlockT
             for (int i = 0; i < items.Count; i++)
             {
                 var    item      = items[i];
-                double txtX      = item.IndentLevel * IndentUnit + SymbolWidth;
-                double naturalH  = MakeText(item, item.Text, avW - txtX).Height;
+                double indent    = item.IndentLevel * IndentUnit;
+                double itemPadH  = item.Padding.Left + item.Padding.Right;
+                double itemPadV  = item.Padding.Top  + item.Padding.Bottom;
+
+                double symTotalW = GetSymbolTotalWidth(item, avW - indent - itemPadH);
+                double txtX      = indent + item.Padding.Left + symTotalW;
+                double txtAvail  = Math.Max(1.0, avW - txtX - item.Padding.Right);
+
+                double txtH      = MakeText(item, item.Text, txtAvail).Height;
+                double rowH      = txtH + itemPadV;
                 double remaining = avH - testY;
 
-                if (naturalH <= remaining + 0.5)
+                if (rowH <= remaining + 0.5)
                 {
                     lastIdx   = i;
                     isPartial = false;
-                    testY    += naturalH + RowSpacing;
+                    testY    += rowH + RowSpacing;
                 }
-                else if (remaining >= item.FontSize * 0.8)
+                else
                 {
+                    double contentH = remaining - itemPadV;
+
+                    if (contentH < item.FontSize * 0.8)
+                        break;
+
                     lastIdx   = i;
                     isPartial = true;
-                    partialH  = remaining;
+                    partialH  = contentH;
                     break;
                 }
-                else break;
             }
 
             if (lastIdx < 0) return;
@@ -181,17 +239,29 @@ namespace QSoft.WPF.TextBlockT
 
             for (int i = 0; i <= lastIdx; i++)
             {
-                var    item   = items[i];
-                double indent = item.IndentLevel * IndentUnit;
-                double txtX   = indent + SymbolWidth;
-                var    symFt  = MakeText(item, item.Symbol, avW - txtX,
-                                         item.SymbolFontSize ?? item.FontSize);
-                txtX = symFt.WidthIncludingTrailingWhitespace;
-                var    txtFt  = MakeText(item, item.Text,   avW - txtX);
-                var geometry = txtFt.BuildHighlightGeometry(new Point(0, 0));
-                var lineCount = (int)Math.Ceiling(txtFt.Height / 20);
-                var symFt_y = (txtFt.Height - symFt.Height) / 2;
-                dc.DrawText(symFt, new Point(indent, symFt_y));
+                var    item     = items[i];
+                double indent   = item.IndentLevel * IndentUnit;
+                double itemPadL = item.Padding.Left;
+                double itemPadT = item.Padding.Top;
+                double itemPadV = itemPadT + item.Padding.Bottom;
+                double itemPadH = itemPadL + item.Padding.Right;
+
+                double symTotalW = 0;
+                var    sym       = item.Symbol;
+                FormattedText? symFt = null;
+
+                if (sym != null && !string.IsNullOrEmpty(sym.Text))
+                {
+                    double symAvail = Math.Max(1.0, avW - indent - itemPadH
+                                                       - sym.Padding.Left - sym.Padding.Right);
+                    symFt     = MakeSymbolText(sym, symAvail);
+                    symTotalW = sym.Padding.Left + symFt.WidthIncludingTrailingWhitespace + sym.Padding.Right;
+                }
+
+                double txtX     = indent + itemPadL + symTotalW;
+                double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
+                var    txtFt    = MakeText(item, item.Text, txtAvail);
+                double drawY    = y + itemPadT;
 
                 if (i == lastIdx && hasMore)
                 {
@@ -199,29 +269,29 @@ namespace QSoft.WPF.TextBlockT
                     {
                         txtFt.MaxTextHeight = Math.Max(item.FontSize, partialH);
                         txtFt.Trimming      = TextTrimming.CharacterEllipsis;
-                        dc.DrawText(txtFt, new Point(txtX, y));
                     }
                     else
                     {
-                        var withEllipsis = MakeText(item, item.Text.TrimEnd() + " ...", avW - txtX);
-                        if (Math.Abs(withEllipsis.Height - txtFt.Height) < 1.0)
-                        {
-                            dc.DrawText(withEllipsis, new Point(txtX, y));
-                        }
-                        else
+                        var withEllipsis = MakeText(item, item.Text.TrimEnd() + " ...", txtAvail);
+                        if (Math.Abs(withEllipsis.Height - txtFt.Height) >= 1.0)
                         {
                             withEllipsis.MaxTextHeight = txtFt.Height;
                             withEllipsis.Trimming      = TextTrimming.CharacterEllipsis;
-                            dc.DrawText(withEllipsis, new Point(txtX, y));
                         }
+                        txtFt = withEllipsis;
                     }
                 }
-                else
+                dc.DrawText(txtFt, new Point(txtX, drawY));
+
+                if (symFt != null && sym != null)
                 {
-                    dc.DrawText(txtFt, new Point(txtX, y));
+                    double symOffsetY = GetSymbolOffsetY(sym, symFt.Height, txtFt.Height);
+                    dc.DrawText(symFt, new Point(
+                        indent + itemPadL + sym.Padding.Left,
+                        y + itemPadT + symOffsetY));
                 }
 
-                y += txtFt.Height + RowSpacing;
+                y += txtFt.Height + itemPadV + RowSpacing;
             }
         }
     }
