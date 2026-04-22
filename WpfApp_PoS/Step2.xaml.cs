@@ -34,6 +34,7 @@ namespace WpfApp_PoS
         {
             InitializeComponent();
         }
+        //qxbn yfub kdct vyrb
         private BarcodeScanner _scanner;
         private ClaimedBarcodeScanner _claimedScanner;
         MediaCapture _mediaCapture;
@@ -58,6 +59,8 @@ namespace WpfApp_PoS
 
                 if (_claimedScanner != null)
                 {
+                    var symbologies = new List<uint> { BarcodeSymbologies.Qr};
+                    await _claimedScanner.SetActiveSymbologiesAsync([BarcodeSymbologies.Qr]);
                     _claimedScanner.DataReceived += ClaimedScanner_DataReceived;
                     await _claimedScanner.EnableAsync();
                 }
@@ -66,11 +69,13 @@ namespace WpfApp_PoS
                 await _mediaCapture.InitializeAsync(new MediaCaptureInitializationSettings()
                 {
                     VideoDeviceId = _scanner.VideoDeviceId,
+                    StreamingCaptureMode = StreamingCaptureMode.Video,
                     MemoryPreference = MediaCaptureMemoryPreference.Cpu,
                 });
                 var b1 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.Lid);
                 var b2 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.CameraHardware);
                 _mediaCapture.VideoDeviceController.CameraOcclusionInfo.StateChanged += CameraOcclusionInfo_StateChanged;
+
                 var fs = _mediaCapture.FrameSources.FirstOrDefault();
                 _mediaFrameReader = await _mediaCapture.CreateFrameReaderAsync(fs.Value, MediaEncodingSubtypes.Bgra8);
                 _mediaFrameReader.FrameArrived += Mr_FrameArrived;
@@ -84,27 +89,34 @@ namespace WpfApp_PoS
             var softwareBitmap = videoMediaFrame?.SoftwareBitmap;
             if (softwareBitmap is not null)
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                try
                 {
-                    using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
-                    using var reference = m.CreateReference();
-                    if (this.m_MainUI.Preview == null)
+                    await this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.m_MainUI.Preview = new WriteableBitmap((int)softwareBitmap.PixelWidth, (int)softwareBitmap.PixelHeight, 96, 96, PixelFormats.Bgr32, null);
+                        using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
+                        using var reference = m.CreateReference();
+                        if (this.m_MainUI.Preview == null)
+                        {
+                            this.m_MainUI.Preview = new WriteableBitmap((int)softwareBitmap.PixelWidth, (int)softwareBitmap.PixelHeight, 96, 96, PixelFormats.Bgr32, null);
 
-                    }
-                    this.m_MainUI.Preview.Lock();
+                        }
+                        this.m_MainUI.Preview.Lock();
 
-                    unsafe
-                    {
-                        (reference.As<IMemoryBufferByteAccess>()).GetBuffer(out var ptr, out var capacity);
+                        unsafe
+                        {
+                            (reference.As<IMemoryBufferByteAccess>()).GetBuffer(out var ptr, out var capacity);
 
-                        NativeMemory.Copy(ptr, (void*)this.m_MainUI.Preview.BackBuffer, capacity);
-                        this.m_MainUI.Preview.AddDirtyRect(new Int32Rect(0, 0, this.m_MainUI.Preview.PixelWidth, this.m_MainUI.Preview.PixelHeight));
-                    }
-                    this.m_MainUI.Preview.Unlock();
+                            NativeMemory.Copy(ptr, (void*)this.m_MainUI.Preview.BackBuffer, capacity);
+                            this.m_MainUI.Preview.AddDirtyRect(new Int32Rect(0, 0, this.m_MainUI.Preview.PixelWidth, this.m_MainUI.Preview.PixelHeight));
+                        }
+                        this.m_MainUI.Preview.Unlock();
+                    });
+                }
+                catch(Exception ee)
+                {
 
-                });
+                }
+                
             }
         }
 

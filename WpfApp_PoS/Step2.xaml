@@ -14,6 +14,6 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Image Source="{Binding Preview}"/>
-        <TextBox Text="{Binding License}" Grid.Column="1"/>
+        <TextBox Text="{Binding License}" Grid.Column="1" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
     </Grid>
 </UserControl>

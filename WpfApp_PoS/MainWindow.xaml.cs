@@ -54,7 +54,7 @@ namespace WpfApp_PoS
 
         async private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if(this.m_MainUI != null)return;
+            if (this.m_MainUI != null) return;
             this.DataContext = this.m_MainUI = new MainUI();
             RequestLicense sj = new RequestLicense();
             sj.Version = 1;
@@ -78,18 +78,31 @@ namespace WpfApp_PoS
                 }
             }
 
-            this.m_MainUI.SendJson = JsonSerializer.Serialize(sj, new JsonSerializerOptions() { WriteIndented = true });
+            this.m_MainUI.SendLicense = JsonSerializer.Serialize(sj, new JsonSerializerOptions() { WriteIndented = true });
 
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode($"mailto:someone@example.com?subject=Hello&body={this.m_MainUI.SendJson}", QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
-            Bitmap qrCodeImage = qrCode.GetGraphic(20);
-            this.image.Source = ConvertBitmapToImageSource(qrCodeImage);
-            
+            GenerateQRCode($"mailto:test@yahoo.com?subject=Demo Credential&body={this.m_MainUI.SendLicense}");
+
 
         }
 
-        
+        private void radiobutton_mail_Click(object sender, RoutedEventArgs e)
+        {
+            GenerateQRCode($"mailto:test@yahoo.com?subject=Demo Credential&body={this.m_MainUI.SendLicense}");
+        }
+
+        private void radiobutton_text_Click(object sender, RoutedEventArgs e)
+        {
+            GenerateQRCode(this.m_MainUI.SendLicense);
+        }
+
+        void GenerateQRCode(string data)
+        {
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+            QRCode qrCode = new QRCode(qrCodeData);
+            Bitmap qrCodeImage = qrCode.GetGraphic(20);
+            this.image.Source = ConvertBitmapToImageSource(qrCodeImage);
+        }
     }
 
     public class MainUI : INotifyPropertyChanged
@@ -100,11 +113,11 @@ namespace WpfApp_PoS
             set { m_Preview = value; this.Update(); }
             get => m_Preview;
         }
-        string m_SendJson;
-        public string SendJson
+        string m_SendLicense;
+        public string SendLicense
         {
-            set { m_SendJson = value;this.Update(); }
-            get => m_SendJson;
+            set { m_SendLicense = value;this.Update(); }
+            get => m_SendLicense;
         }
 
         string m_License;

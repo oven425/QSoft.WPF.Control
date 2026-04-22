@@ -151,7 +151,7 @@ namespace QSoft.WPF.TextBlockT
                 VerticalAlignment.Center  => sym.Padding.Top + Math.Max(0, extra / 2.0),
                 VerticalAlignment.Bottom  => sym.Padding.Top + Math.Max(0, extra),
                 VerticalAlignment.Stretch => sym.Padding.Top + Math.Max(0, extra / 2.0),
-                _                         => sym.Padding.Top,   // Top（預設）
+                _                         => sym.Padding.Top,
             };
         }
 
@@ -190,109 +190,136 @@ namespace QSoft.WPF.TextBlockT
             var items = Items;
             if (items is null || items.Count == 0) return;
 
-            double avW       = ActualWidth;
-            double avH       = ActualHeight;
-            int    lastIdx   = -1;
-            bool   isPartial = false;
-            double partialH  = 0;
-            double testY     = 0;
-
-            for (int i = 0; i < items.Count; i++)
+            double avW = ActualWidth;
+            double avH = ActualHeight;
+            
+            for(int i= 0;i<items.Count;i++)
             {
-                var    item      = items[i];
-                double indent    = item.IndentLevel * IndentUnit;
-                double itemPadH  = item.Padding.Left + item.Padding.Right;
-                double itemPadV  = item.Padding.Top  + item.Padding.Bottom;
-
-                double symTotalW = GetSymbolTotalWidth(item, avW - indent - itemPadH);
-                double txtX      = indent + item.Padding.Left + symTotalW;
-                double txtAvail  = Math.Max(1.0, avW - txtX - item.Padding.Right);
-
-                double txtH      = MakeText(item, item.Text, txtAvail).Height;
-                double rowH      = txtH + itemPadV;
-                double remaining = avH - testY;
-
-                if (rowH <= remaining + 0.5)
+                var item = items[i];
+                var w = avW - item.Padding.Left - item.Padding.Right;
+                var symbolft = MakeSymbolText(item.Symbol, avW);
+                w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+                var txtft = MakeText(item, item.Text, w);
+                txtft.MaxTextHeight = avH;
+                var h =txtft.Height + item.Padding.Top + item.Padding.Bottom;
+                if(h == 0)
                 {
-                    lastIdx   = i;
-                    isPartial = false;
-                    testY    += rowH + RowSpacing;
+
+                }
+                else if(avH >= h)
+                {
+                    avH = avH - h;
                 }
                 else
                 {
-                    double contentH = remaining - itemPadV;
 
-                    if (contentH < item.FontSize * 0.8)
-                        break;
-
-                    lastIdx   = i;
-                    isPartial = true;
-                    partialH  = contentH;
-                    break;
                 }
+                
             }
 
-            if (lastIdx < 0) return;
 
-            bool   hasMore = isPartial || lastIdx < items.Count - 1;
-            double y       = 0;
+            //int    lastIdx   = -1;
+            //bool   isPartial = false;
+            //double partialH  = 0;
+            //double testY     = 0;
 
-            for (int i = 0; i <= lastIdx; i++)
-            {
-                var    item     = items[i];
-                double indent   = item.IndentLevel * IndentUnit;
-                double itemPadL = item.Padding.Left;
-                double itemPadT = item.Padding.Top;
-                double itemPadV = itemPadT + item.Padding.Bottom;
-                double itemPadH = itemPadL + item.Padding.Right;
+            //for (int i = 0; i < items.Count; i++)
+            //{
+            //    var    item      = items[i];
+            //    double itemPadH  = item.Padding.Left + item.Padding.Right;
+            //    double itemPadV  = item.Padding.Top  + item.Padding.Bottom;
 
-                double symTotalW = 0;
-                var    sym       = item.Symbol;
-                FormattedText? symFt = null;
+            //    double symTotalW = GetSymbolTotalWidth(item, avW - itemPadH);
+            //    double txtX      = item.Padding.Left + symTotalW;
+            //    double txtAvail  = Math.Max(1.0, avW - txtX - item.Padding.Right);
 
-                if (sym != null && !string.IsNullOrEmpty(sym.Text))
-                {
-                    double symAvail = Math.Max(1.0, avW - indent - itemPadH
-                                                       - sym.Padding.Left - sym.Padding.Right);
-                    symFt     = MakeSymbolText(sym, symAvail);
-                    symTotalW = sym.Padding.Left + symFt.WidthIncludingTrailingWhitespace + sym.Padding.Right;
-                }
+            //    double txtH      = MakeText(item, item.Text, txtAvail).Height;
+            //    double rowH      = txtH + itemPadV;
+            //    double remaining = avH - testY;
 
-                double txtX     = indent + itemPadL + symTotalW;
-                double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
-                var    txtFt    = MakeText(item, item.Text, txtAvail);
-                double drawY    = y + itemPadT;
+            //    if (rowH <= remaining + 0.0)
+            //    {
+            //        lastIdx   = i;
+            //        isPartial = false;
+            //        testY    += rowH + RowSpacing;
+            //    }
+            //    else
+            //    {
+            //        double contentH = remaining - itemPadV;
 
-                if (i == lastIdx && hasMore)
-                {
-                    if (isPartial)
-                    {
-                        txtFt.MaxTextHeight = Math.Max(item.FontSize, partialH);
-                        txtFt.Trimming      = TextTrimming.CharacterEllipsis;
-                    }
-                    else
-                    {
-                        var withEllipsis = MakeText(item, item.Text.TrimEnd() + " ...", txtAvail);
-                        if (Math.Abs(withEllipsis.Height - txtFt.Height) >= 1.0)
-                        {
-                            withEllipsis.MaxTextHeight = txtFt.Height;
-                            withEllipsis.Trimming      = TextTrimming.CharacterEllipsis;
-                        }
-                        txtFt = withEllipsis;
-                    }
-                }
-                dc.DrawText(txtFt, new Point(txtX, drawY));
+            //        if (contentH < item.FontSize)
+            //            break;
 
-                if (symFt != null && sym != null)
-                {
-                    double symOffsetY = GetSymbolOffsetY(sym, symFt.Height, txtFt.Height);
-                    dc.DrawText(symFt, new Point(
-                        indent + itemPadL + sym.Padding.Left,
-                        y + itemPadT + symOffsetY));
-                }
+            //        lastIdx   = i;
+            //        isPartial = true;
+            //        partialH  = contentH;
+            //        break;
+            //    }
+            //}
 
-                y += txtFt.Height + itemPadV + RowSpacing;
-            }
+            //if (lastIdx < 0) return;
+
+            //bool   hasMore = isPartial || lastIdx < items.Count - 1;
+            //double y       = 0;
+
+            //for (int i = 0; i <= lastIdx; i++)
+            //{
+            //    var    item     = items[i];
+            //    double indent   = item.IndentLevel * IndentUnit;
+            //    double itemPadL = item.Padding.Left;
+            //    double itemPadT = item.Padding.Top;
+            //    double itemPadV = itemPadT + item.Padding.Bottom;
+            //    double itemPadH = itemPadL + item.Padding.Right;
+
+            //    double symTotalW = 0;
+            //    var    sym       = item.Symbol;
+            //    FormattedText? symFt = null;
+
+            //    if (sym != null && !string.IsNullOrEmpty(sym.Text))
+            //    {
+            //        double symAvail = Math.Max(1.0, avW - indent - itemPadH
+            //                                           - sym.Padding.Left - sym.Padding.Right);
+            //        symFt     = MakeSymbolText(sym, symAvail);
+            //        symTotalW = sym.Padding.Left + symFt.WidthIncludingTrailingWhitespace + sym.Padding.Right;
+            //    }
+
+            //    double txtX     = indent + itemPadL + symTotalW;
+            //    double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
+            //    var    txtFt    = MakeText(item, item.Text, txtAvail);
+            //    double drawY    = y + itemPadT;
+
+            //    if (i == lastIdx && hasMore)
+            //    {
+            //        if (isPartial)
+            //        {
+            //            System.Diagnostics.Trace.WriteLine($"txtFt.Height:{txtFt.Height} partialH:{partialH}");
+            //            txtFt.MaxTextHeight = Math.Max(item.FontSize, partialH);
+            //            txtFt.Trimming      = TextTrimming.CharacterEllipsis;
+
+            //        }
+            //        else
+            //        {
+            //            var withEllipsis = MakeText(item, item.Text.TrimEnd() + " ...", txtAvail);
+            //            if (Math.Abs(withEllipsis.Height - txtFt.Height) >= 1.0)
+            //            {
+            //                withEllipsis.MaxTextHeight = txtFt.Height;
+            //                withEllipsis.Trimming = TextTrimming.CharacterEllipsis;
+            //            }
+            //            txtFt = withEllipsis;
+            //        }
+            //    }
+            //    dc.DrawText(txtFt, new Point(txtX, drawY));
+
+            //    if (symFt != null && sym != null /*&& txtFt.Height>0*/)
+            //    {
+            //        double symOffsetY = GetSymbolOffsetY(sym, symFt.Height, txtFt.Height);
+            //        dc.DrawText(symFt, new Point(
+            //            indent + itemPadL + sym.Padding.Left,
+            //            y + itemPadT + symOffsetY));
+            //    }
+
+            //    y += txtFt.Height + itemPadV + RowSpacing;
+            //}
         }
     }
 }
