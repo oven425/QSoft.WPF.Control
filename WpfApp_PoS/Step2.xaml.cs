@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +34,10 @@ namespace WpfApp_PoS
         public Step2()
         {
             InitializeComponent();
+            var ll = new License();
+            ll.Version1.Begin = DateTime.Now;
+            ll.Version1.End = DateTime.MinValue;
+            var jsonstr = JsonSerializer.Serialize(ll, new JsonSerializerOptions { WriteIndented = true } );
         }
         //qxbn yfub kdct vyrb
         private BarcodeScanner _scanner;
@@ -72,9 +77,9 @@ namespace WpfApp_PoS
                     StreamingCaptureMode = StreamingCaptureMode.Video,
                     MemoryPreference = MediaCaptureMemoryPreference.Cpu,
                 });
-                var b1 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.Lid);
-                var b2 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.CameraHardware);
-                _mediaCapture.VideoDeviceController.CameraOcclusionInfo.StateChanged += CameraOcclusionInfo_StateChanged;
+                //var b1 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.Lid);
+                //var b2 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.CameraHardware);
+                //_mediaCapture.VideoDeviceController.CameraOcclusionInfo.StateChanged += CameraOcclusionInfo_StateChanged;
 
                 var fs = _mediaCapture.FrameSources.FirstOrDefault();
                 _mediaFrameReader = await _mediaCapture.CreateFrameReaderAsync(fs.Value, MediaEncodingSubtypes.Bgra8);
@@ -128,19 +133,33 @@ namespace WpfApp_PoS
             void GetBuffer(out byte* buffer, out uint capacity);
         }
 
-        private void CameraOcclusionInfo_StateChanged(Windows.Media.Devices.CameraOcclusionInfo sender, Windows.Media.Devices.CameraOcclusionStateChangedEventArgs args)
-        {
-            //throw new NotImplementedException();
-        }
+        //private void CameraOcclusionInfo_StateChanged(Windows.Media.Devices.CameraOcclusionInfo sender, Windows.Media.Devices.CameraOcclusionStateChangedEventArgs args)
+        //{
+        //    //throw new NotImplementedException();
+        //}
 
         private void ClaimedScanner_DataReceived(ClaimedBarcodeScanner sender, BarcodeScannerDataReceivedEventArgs args)
         {
             var scanData = args.Report.ScanDataLabel;
-
             using var reader = DataReader.FromBuffer(scanData);
             string result = reader.ReadString(scanData.Length);
             this.m_MainUI.License = result;
+            this.m_MainUI.IsLicensePass = 1;
+            try
+            {
+                var license = JsonSerializer.Deserialize<License>(result);
+                if(license != null)
+                {
+                    if (license.Version1.Begin < DateTime.Now && license.Version1.End > DateTime.Now)
+                    {
+                        this.m_MainUI.IsLicensePass = 2;
+                    }
+                }
+            }
+            catch(Exception ee)
+            {
 
+            }
         }
 
         async private void UserControl_Unloaded(object sender, RoutedEventArgs e)

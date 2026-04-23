@@ -14,6 +14,31 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Image Source="{Binding Preview}"/>
-        <TextBox Text="{Binding License}" Grid.Column="1" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBox Text="{Binding License}" Grid.Column="1" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+            <TextBlock Grid.Row="1">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLicensePass}" Value="0">
+                                <Setter Property="Text" Value=""/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsLicensePass}" Value="1">
+                                <Setter Property="Text" Value="Fail."/>
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsLicensePass}" Value="2">
+                                <Setter Property="Text" Value="Pass."/>
+                                <Setter Property="Foreground" Value="Green"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
     </Grid>
 </UserControl>

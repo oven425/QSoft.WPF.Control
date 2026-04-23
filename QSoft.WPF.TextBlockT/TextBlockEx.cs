@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Media;
 
@@ -50,6 +51,16 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(ForegroundProperty, value);
         }
 
+        public static readonly DependencyProperty BackgroundProperty =
+           DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(TextBlockEx),
+               new FrameworkPropertyMetadata(Brushes.Yellow,
+                   FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public Brush Background
+        {
+            get => (Brush)GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
+        }
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(nameof(FontFamily), typeof(FontFamily), typeof(TextBlockEx),
                 new FrameworkPropertyMetadata(new FontFamily("Arial"),
@@ -160,61 +171,151 @@ namespace QSoft.WPF.TextBlockT
             var items = Items;
             if (items is null || items.Count == 0) return Size.Empty;
 
-            double avW  = availableSize.Width;
-            double y    = 0;
-            double maxW = 0;
+            double avW = availableSize.Width;
+            //double y    = 0;
+            //double maxW = 0;
 
-            foreach (var item in items)
+            //foreach (var item in items)
+            //{
+            //    double indent   = item.IndentLevel * IndentUnit;
+            //    double itemPadH = item.Padding.Left + item.Padding.Right;
+            //    double itemPadV = item.Padding.Top  + item.Padding.Bottom;
+            //    double symTotalW = GetSymbolTotalWidth(item, avW - indent - itemPadH);
+
+            //    double txtX    = indent + item.Padding.Left + symTotalW;
+            //    double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
+            //    var    txtFt   = MakeText(item, item.Text, txtAvail);
+
+            //    y    += txtFt.Height + itemPadV + RowSpacing;
+            //    maxW  = Math.Max(maxW, txtX + txtFt.Width + item.Padding.Right);
+            //}
+            //if (y > 0) y -= RowSpacing;
+
+            //return new Size(
+            //    double.IsInfinity(availableSize.Width)  ? maxW : availableSize.Width,
+            //    double.IsInfinity(availableSize.Height) ? y    : Math.Min(y, availableSize.Height));
+
+
+
+            double w = 0;
+            double h = 0;
+            foreach(var oo in items)
             {
-                double indent   = item.IndentLevel * IndentUnit;
-                double itemPadH = item.Padding.Left + item.Padding.Right;
-                double itemPadV = item.Padding.Top  + item.Padding.Bottom;
-                double symTotalW = GetSymbolTotalWidth(item, avW - indent - itemPadH);
-
-                double txtX    = indent + item.Padding.Left + symTotalW;
-                double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
-                var    txtFt   = MakeText(item, item.Text, txtAvail);
-
-                y    += txtFt.Height + itemPadV + RowSpacing;
-                maxW  = Math.Max(maxW, txtX + txtFt.Width + item.Padding.Right);
+                var symbolft = MakeSymbolText(oo.Symbol, avW);
+                var txtft = MakeText(oo, oo.Text, avW);
+                w = w + oo.Padding.Left + oo.Padding.Right+oo.Symbol.Padding.Left+oo.Symbol.Padding.Right + symbolft.Width + txtft.Width;
+                h = h + oo.Padding.Top + oo.Padding.Bottom + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height + txtft.Height;
             }
-            if (y > 0) y -= RowSpacing;
-
-            return new Size(
-                double.IsInfinity(availableSize.Width)  ? maxW : availableSize.Width,
-                double.IsInfinity(availableSize.Height) ? y    : Math.Min(y, availableSize.Height));
+            if(availableSize.Width < w)
+            {
+                w = availableSize.Width;
+            }
+            if(availableSize.Height < h)
+            {
+                h = availableSize.Height;
+            }
+            return new Size(w, h);
         }
 
         protected override void OnRender(DrawingContext dc)
         {
+            dc.DrawRectangle(Background, null, new Rect(0, 0, ActualWidth, ActualHeight));
             var items = Items;
             if (items is null || items.Count == 0) return;
 
             double avW = ActualWidth;
             double avH = ActualHeight;
-            
-            for(int i= 0;i<items.Count;i++)
+            bool isshowtrimming = false;
+            int rendercount = -1;
+
+            //for (int i= 0;i<items.Count;i++)
+            //{
+            //    var item = items[i];
+            //    var w = avW - item.Padding.Left - item.Padding.Right;
+            //    var symbolft = MakeSymbolText(item.Symbol, avW);
+            //    w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+            //    var txtft = MakeText(item, item.Text, w);
+            //    txtft.MaxTextHeight = avH - item.Padding.Top - item.Padding.Bottom;
+            //    var h =txtft.Height + item.Padding.Top + item.Padding.Bottom;
+            //    if(txtft.MaxTextHeight == 0)
+            //    {
+            //        break;
+            //    }
+            //    else if(avH >= h)
+            //    {
+            //        avH = avH - h;
+            //        rendercount++;
+            //    }
+            //    else
+            //    {
+                    
+            //    }
+            //}
+
+            List<(Point symbolpt, Point textpt, FormattedText symbolft, FormattedText txtft, bool addtrim)> renderlist = [];
+
+            var symbol_y = 0.0;
+            var text_y = 0.0;
+            FormattedText? m_trimmingft = null;
+            for (int i=0; i< items.Count; i++)
             {
                 var item = items[i];
-                var w = avW - item.Padding.Left - item.Padding.Right;
+                var w = avW - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
                 var symbolft = MakeSymbolText(item.Symbol, avW);
                 w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
                 var txtft = MakeText(item, item.Text, w);
-                txtft.MaxTextHeight = avH;
-                var h =txtft.Height + item.Padding.Top + item.Padding.Bottom;
-                if(h == 0)
-                {
-
-                }
-                else if(avH >= h)
-                {
-                    avH = avH - h;
-                }
-                else
-                {
-
-                }
                 
+                txtft.MaxTextHeight = avH - text_y;
+                symbol_y = symbol_y + item.Symbol.Padding.Top;
+                text_y = text_y + item.Padding.Top;
+                var symbolpt = new Point(item.Symbol.Padding.Left, symbol_y);
+                //if (txtft.Height > 0)
+                //{
+                //    dc.DrawText(symbolft, symbolpt);
+                //}
+                    
+                
+                var text_x = item.Symbol.Padding.Left +symbolft.WidthIncludingTrailingWhitespace + item.Symbol.Padding.Right + item.Padding.Left;
+                var textpt = new Point(text_x, text_y);
+                
+                //dc.DrawText(txtft, textpt);
+
+
+                
+
+                text_y = symbol_y = text_y + txtft.Height + item.Padding.Bottom;
+
+                if (txtft.Height == 0)
+                {
+                    if(renderlist.Any())
+                    {
+                        var aa = renderlist.Last();
+                        var aa1 = (aa.symbolpt, aa.textpt, aa.symbolft, m_trimmingft, true);
+                        renderlist.Remove(aa);
+                        renderlist.Add(aa1);
+                    }
+                    
+                    break;
+                }
+
+                if (text_y > avH)
+                {
+                   
+                    break;
+                }
+                m_trimmingft = MakeText(item, item.Text.TrimEnd() + " ...", w);
+                m_trimmingft.MaxTextHeight = txtft.MaxTextHeight;
+                renderlist.Add((symbolpt, textpt, symbolft, txtft, false));
+            }
+
+            foreach(var oo in renderlist)
+            {
+                if (oo.txtft.Height > 0)
+                {
+                    dc.DrawText(oo.symbolft, oo.symbolpt);
+                    
+                }
+                dc.DrawText(oo.txtft, oo.textpt);
             }
 
 

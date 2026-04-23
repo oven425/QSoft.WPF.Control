@@ -127,6 +127,13 @@ namespace WpfApp_PoS
             get => m_License;
         }
 
+        int m_IsLicensePass = 0;
+        public int IsLicensePass
+        {
+            set { m_IsLicensePass = value; this.Update(); }
+            get => m_IsLicensePass;
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update([CallerMemberName] string name="")
         {
@@ -144,5 +151,17 @@ namespace WpfApp_PoS
     {
         public int Version { set; get; }
         public RequestLicense1 Version1 { set; get; } = new RequestLicense1();
+    }
+
+    public class License1
+    {
+        public DateTime Begin {  set; get; } = DateTime.Now;
+        public DateTime End { set; get; } = DateTime.Now.AddYears(1);
+    }
+
+    public class License
+    {
+        public int Version { set; get; }
+        public License1 Version1 { set; get; } = new License1();
     }
 }
