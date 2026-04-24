@@ -11,8 +11,33 @@ namespace QSoft.WPF.TextBlockT
 {
     public class TextBlockEx : FrameworkElement
     {
-        private const double IndentUnit = 0.0;
-        private const double RowSpacing = 0.0;
+        public static readonly DependencyProperty LeadingElementProperty =  DependencyProperty.Register(nameof(LeadingElement), typeof(UIElement), typeof(TextBlockEx),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnLeadingElementChanged));
+
+        public UIElement? LeadingElement
+        {
+            get => (UIElement?)GetValue(LeadingElementProperty);
+            set => SetValue(LeadingElementProperty, value);
+        }
+
+        protected override int VisualChildrenCount
+            => LeadingElement is null ? 0 : 1;
+
+        protected override Visual GetVisualChild(int index)
+        {
+            if (LeadingElement is null || index != 0)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return LeadingElement;
+        }
+
+        private static void OnLeadingElementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var ctrl = (TextBlockEx)d;
+            if (e.OldValue is UIElement oldEl)
+                ctrl.RemoveVisualChild(oldEl);
+            if (e.NewValue is UIElement newEl)
+                ctrl.AddVisualChild(newEl);
+        }
 
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register(nameof(Items),
@@ -143,59 +168,15 @@ namespace QSoft.WPF.TextBlockT
             return ft;
         }
 
-        private double GetSymbolTotalWidth(TextBlockExElement item, double availableWidth)
-        {
-            var sym = item.Symbol;
-            if (sym == null || string.IsNullOrEmpty(sym.Text)) return 0;
-
-            double padH    = sym.Padding.Left + sym.Padding.Right;
-            double avail   = Math.Max(1.0, availableWidth - padH);
-            var    symFt   = MakeSymbolText(sym, avail);
-            return sym.Padding.Left + symFt.WidthIncludingTrailingWhitespace + sym.Padding.Right;
-        }
-
-        private static double GetSymbolOffsetY(Symbol sym, double symTextH, double rowContentH)
-        {
-            double extra = rowContentH - symTextH - sym.Padding.Top - sym.Padding.Bottom;
-            return sym.VerticalAlignment switch
-            {
-                VerticalAlignment.Center  => sym.Padding.Top + Math.Max(0, extra / 2.0),
-                VerticalAlignment.Bottom  => sym.Padding.Top + Math.Max(0, extra),
-                VerticalAlignment.Stretch => sym.Padding.Top + Math.Max(0, extra / 2.0),
-                _                         => sym.Padding.Top,
-            };
-        }
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            LeadingElement?.Measure(availableSize);
+
             var items = Items;
-            if (items is null || items.Count == 0) return Size.Empty;
+            if (items is null || items.Count == 0) return LeadingElement?.DesiredSize ?? Size.Empty;
 
             double avW = availableSize.Width;
-            //double y    = 0;
-            //double maxW = 0;
-
-            //foreach (var item in items)
-            //{
-            //    double indent   = item.IndentLevel * IndentUnit;
-            //    double itemPadH = item.Padding.Left + item.Padding.Right;
-            //    double itemPadV = item.Padding.Top  + item.Padding.Bottom;
-            //    double symTotalW = GetSymbolTotalWidth(item, avW - indent - itemPadH);
-
-            //    double txtX    = indent + item.Padding.Left + symTotalW;
-            //    double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
-            //    var    txtFt   = MakeText(item, item.Text, txtAvail);
-
-            //    y    += txtFt.Height + itemPadV + RowSpacing;
-            //    maxW  = Math.Max(maxW, txtX + txtFt.Width + item.Padding.Right);
-            //}
-            //if (y > 0) y -= RowSpacing;
-
-            //return new Size(
-            //    double.IsInfinity(availableSize.Width)  ? maxW : availableSize.Width,
-            //    double.IsInfinity(availableSize.Height) ? y    : Math.Min(y, availableSize.Height));
-
-
 
             double w = 0;
             double h = 0;
@@ -217,6 +198,17 @@ namespace QSoft.WPF.TextBlockT
             return new Size(w, h);
         }
 
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            // 排版到左上角 (0, 0)
+            if (LeadingElement is not null)
+            {
+                var desired = LeadingElement.DesiredSize;
+                LeadingElement.Arrange(new Rect(0, 0, desired.Width, desired.Height));
+            }
+            return finalSize;
+        }
+
         protected override void OnRender(DrawingContext dc)
         {
             dc.DrawRectangle(Background, null, new Rect(0, 0, ActualWidth, ActualHeight));
@@ -225,32 +217,6 @@ namespace QSoft.WPF.TextBlockT
 
             double avW = ActualWidth;
             double avH = ActualHeight;
-            bool isshowtrimming = false;
-            int rendercount = -1;
-
-            //for (int i= 0;i<items.Count;i++)
-            //{
-            //    var item = items[i];
-            //    var w = avW - item.Padding.Left - item.Padding.Right;
-            //    var symbolft = MakeSymbolText(item.Symbol, avW);
-            //    w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
-            //    var txtft = MakeText(item, item.Text, w);
-            //    txtft.MaxTextHeight = avH - item.Padding.Top - item.Padding.Bottom;
-            //    var h =txtft.Height + item.Padding.Top + item.Padding.Bottom;
-            //    if(txtft.MaxTextHeight == 0)
-            //    {
-            //        break;
-            //    }
-            //    else if(avH >= h)
-            //    {
-            //        avH = avH - h;
-            //        rendercount++;
-            //    }
-            //    else
-            //    {
-                    
-            //    }
-            //}
 
             List<(Point symbolpt, Point textpt, FormattedText symbolft, FormattedText txtft, bool addtrim)> renderlist = [];
 
@@ -317,110 +283,6 @@ namespace QSoft.WPF.TextBlockT
                 }
                 dc.DrawText(oo.txtft, oo.textpt);
             }
-
-
-            //int    lastIdx   = -1;
-            //bool   isPartial = false;
-            //double partialH  = 0;
-            //double testY     = 0;
-
-            //for (int i = 0; i < items.Count; i++)
-            //{
-            //    var    item      = items[i];
-            //    double itemPadH  = item.Padding.Left + item.Padding.Right;
-            //    double itemPadV  = item.Padding.Top  + item.Padding.Bottom;
-
-            //    double symTotalW = GetSymbolTotalWidth(item, avW - itemPadH);
-            //    double txtX      = item.Padding.Left + symTotalW;
-            //    double txtAvail  = Math.Max(1.0, avW - txtX - item.Padding.Right);
-
-            //    double txtH      = MakeText(item, item.Text, txtAvail).Height;
-            //    double rowH      = txtH + itemPadV;
-            //    double remaining = avH - testY;
-
-            //    if (rowH <= remaining + 0.0)
-            //    {
-            //        lastIdx   = i;
-            //        isPartial = false;
-            //        testY    += rowH + RowSpacing;
-            //    }
-            //    else
-            //    {
-            //        double contentH = remaining - itemPadV;
-
-            //        if (contentH < item.FontSize)
-            //            break;
-
-            //        lastIdx   = i;
-            //        isPartial = true;
-            //        partialH  = contentH;
-            //        break;
-            //    }
-            //}
-
-            //if (lastIdx < 0) return;
-
-            //bool   hasMore = isPartial || lastIdx < items.Count - 1;
-            //double y       = 0;
-
-            //for (int i = 0; i <= lastIdx; i++)
-            //{
-            //    var    item     = items[i];
-            //    double indent   = item.IndentLevel * IndentUnit;
-            //    double itemPadL = item.Padding.Left;
-            //    double itemPadT = item.Padding.Top;
-            //    double itemPadV = itemPadT + item.Padding.Bottom;
-            //    double itemPadH = itemPadL + item.Padding.Right;
-
-            //    double symTotalW = 0;
-            //    var    sym       = item.Symbol;
-            //    FormattedText? symFt = null;
-
-            //    if (sym != null && !string.IsNullOrEmpty(sym.Text))
-            //    {
-            //        double symAvail = Math.Max(1.0, avW - indent - itemPadH
-            //                                           - sym.Padding.Left - sym.Padding.Right);
-            //        symFt     = MakeSymbolText(sym, symAvail);
-            //        symTotalW = sym.Padding.Left + symFt.WidthIncludingTrailingWhitespace + sym.Padding.Right;
-            //    }
-
-            //    double txtX     = indent + itemPadL + symTotalW;
-            //    double txtAvail = Math.Max(1.0, avW - txtX - item.Padding.Right);
-            //    var    txtFt    = MakeText(item, item.Text, txtAvail);
-            //    double drawY    = y + itemPadT;
-
-            //    if (i == lastIdx && hasMore)
-            //    {
-            //        if (isPartial)
-            //        {
-            //            System.Diagnostics.Trace.WriteLine($"txtFt.Height:{txtFt.Height} partialH:{partialH}");
-            //            txtFt.MaxTextHeight = Math.Max(item.FontSize, partialH);
-            //            txtFt.Trimming      = TextTrimming.CharacterEllipsis;
-
-            //        }
-            //        else
-            //        {
-            //            var withEllipsis = MakeText(item, item.Text.TrimEnd() + " ...", txtAvail);
-            //            if (Math.Abs(withEllipsis.Height - txtFt.Height) >= 1.0)
-            //            {
-            //                withEllipsis.MaxTextHeight = txtFt.Height;
-            //                withEllipsis.Trimming = TextTrimming.CharacterEllipsis;
-            //            }
-            //            txtFt = withEllipsis;
-            //        }
-            //    }
-            //    dc.DrawText(txtFt, new Point(txtX, drawY));
-
-            //    if (symFt != null && sym != null /*&& txtFt.Height>0*/)
-            //    {
-            //        double symOffsetY = GetSymbolOffsetY(sym, symFt.Height, txtFt.Height);
-            //        dc.DrawText(symFt, new Point(
-            //            indent + itemPadL + sym.Padding.Left,
-            //            y + itemPadT + symOffsetY));
-            //    }
-
-            //    y += txtFt.Height + itemPadV + RowSpacing;
-            //}
         }
     }
 }
