@@ -20,6 +20,7 @@ using Windows.Devices.PointOfService;
 using Windows.Graphics.Imaging;
 using Windows.Media.Capture;
 using Windows.Media.Capture.Frames;
+using Windows.Media.Effects;
 using Windows.Media.MediaProperties;
 using Windows.Storage.Streams;
 using WinRT;
@@ -56,7 +57,7 @@ namespace WpfApp_PoS
                 return;
             }
             _scanner = await BarcodeScanner.GetDefaultAsync();
-
+            
             if (_scanner != null)
             {
                 // 2. 佔用掃描器
@@ -64,7 +65,6 @@ namespace WpfApp_PoS
 
                 if (_claimedScanner != null)
                 {
-                    var symbologies = new List<uint> { BarcodeSymbologies.Qr};
                     await _claimedScanner.SetActiveSymbologiesAsync([BarcodeSymbologies.Qr]);
                     _claimedScanner.DataReceived += ClaimedScanner_DataReceived;
                     await _claimedScanner.EnableAsync();
@@ -80,7 +80,9 @@ namespace WpfApp_PoS
                 //var b1 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.Lid);
                 //var b2 = _mediaCapture.VideoDeviceController.CameraOcclusionInfo.IsOcclusionKindSupported(Windows.Media.Devices.CameraOcclusionKind.CameraHardware);
                 //_mediaCapture.VideoDeviceController.CameraOcclusionInfo.StateChanged += CameraOcclusionInfo_StateChanged;
-
+                VideoTransformEffectDefinition videoeffect = new VideoTransformEffectDefinition();
+                videoeffect.Mirror = MediaMirroringOptions.Horizontal;
+                await _mediaCapture.AddVideoEffectAsync(videoeffect, mediaStreamType: MediaStreamType.VideoPreview);
                 var fs = _mediaCapture.FrameSources.FirstOrDefault();
                 _mediaFrameReader = await _mediaCapture.CreateFrameReaderAsync(fs.Value, MediaEncodingSubtypes.Bgra8);
                 _mediaFrameReader.FrameArrived += Mr_FrameArrived;

@@ -3,6 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:QSoft.WPF.TextBlockT"
         Title="MainWindow" Height="450" Width="800">
+    <!--<Window.Resources>
+        <local:TextBlockExElementCollection x:Key="aaa">
+            <local:TextBlockExElement/>
+        </local:TextBlockExElementCollection>
+    </Window.Resources>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -13,7 +18,7 @@
                 <Button>123</Button>
             </local:TextBlockEx.LeadingElement>
             <local:TextBlockEx.Items>
-                <local:TextBlockExElement IndentLevel="0" FontSize="40" Text="C# 型別選擇指南">
+                <!--<local:TextBlockExElement IndentLevel="0" FontSize="40" Text="C# 型別選擇指南">
                     <local:TextBlockExElement.Symbol>
                         <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,20,10,0"/>
                     </local:TextBlockExElement.Symbol>
@@ -37,6 +42,27 @@
                         <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
                     </local:TextBlockExElement.Symbol>
                 </local:TextBlockExElement>
+                <local:TextBlockExElementArray>
+                    <local:TextBlockExElementArray.List>
+                        <local:TextBlockExElement Foreground="Pink" Text="record 是 C# 9 引入的型別，預設具備不可變性（immutable），編譯器會自動合成結構相等性比較（Equals、==）、GetHashCode、ToString 以及非破壞性複製的 with 運算式，非常適合用於資料傳輸物件（DTO）、事件酬載或任何以值語意為主的資料容器。">
+                            <local:TextBlockExElement.Symbol>
+                                <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
+                            </local:TextBlockExElement.Symbol>
+                        </local:TextBlockExElement>
+                    </local:TextBlockExElementArray.List>
+                </local:TextBlockExElementArray>-->
+                <local:TextBlockExElementArray ItemsSource="{Binding TotalSums[2].Items}" >
+                    <local:TextBlockExElementArray.ItemTemplate>
+                        <DataTemplate>
+                            <local:TextBlockExElement Foreground="Blue" Text="{Binding}">
+                                <local:TextBlockExElement.Symbol>
+                                    <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
+                                </local:TextBlockExElement.Symbol>
+                            </local:TextBlockExElement>
+                        </DataTemplate>
+                    </local:TextBlockExElementArray.ItemTemplate>
+
+                </local:TextBlockExElementArray>
             </local:TextBlockEx.Items>
         </local:TextBlockEx>
         

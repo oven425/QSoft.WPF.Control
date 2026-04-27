@@ -9,6 +9,8 @@ using System.Windows.Media;
 
 namespace QSoft.WPF.TextBlockT
 {
+
+    
     public class TextBlockEx : FrameworkElement
     {
         public static readonly DependencyProperty LeadingElementProperty =  DependencyProperty.Register(nameof(LeadingElement), typeof(UIElement), typeof(TextBlockEx),
@@ -41,15 +43,15 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register(nameof(Items),
-                typeof(ObservableCollection<TextBlockExElement>), typeof(TextBlockEx),
+                typeof(ObservableCollection<TextBlockExElementBase>), typeof(TextBlockEx),
                 new FrameworkPropertyMetadata(null,
                     FrameworkPropertyMetadataOptions.AffectsMeasure |
                     FrameworkPropertyMetadataOptions.AffectsRender,
                     OnItemsChanged));
 
-        public ObservableCollection<TextBlockExElement> Items
+        public ObservableCollection<TextBlockExElementBase> Items
         {
-            get => (ObservableCollection<TextBlockExElement>)GetValue(ItemsProperty);
+            get => (ObservableCollection<TextBlockExElementBase>)GetValue(ItemsProperty);
             set => SetValue(ItemsProperty, value);
         }
 
@@ -100,11 +102,11 @@ namespace QSoft.WPF.TextBlockT
 
         public TextBlockEx()
         {
-            Items = new ObservableCollection<TextBlockExElement>();
+            Items = new ObservableCollection<TextBlockExElementBase>();
         }
 
         protected override IEnumerator LogicalChildren
-            => (Items ?? new ObservableCollection<TextBlockExElement>()).GetEnumerator();
+            => (Items ?? new ObservableCollection<TextBlockExElementBase>()).GetEnumerator();
 
         private static void OnItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -180,13 +182,24 @@ namespace QSoft.WPF.TextBlockT
 
             double w = 0;
             double h = 0;
-            foreach(var oo in items)
+            var ll = items.SelectMany(x => x.Elements, (x,y)=>new { x, y });
+            for(int i=0; i<items.Count; i++)
             {
-                var symbolft = MakeSymbolText(oo.Symbol, avW);
-                var txtft = MakeText(oo, oo.Text, avW);
-                w = w + oo.Padding.Left + oo.Padding.Right+oo.Symbol.Padding.Left+oo.Symbol.Padding.Right + symbolft.Width + txtft.Width;
-                h = h + oo.Padding.Top + oo.Padding.Bottom + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height + txtft.Height;
+                for(int j=0; j<items[i].Elements.Length; j++)
+                {
+                    var oo = items[i].Elements[j];
+                    var symbolft = MakeSymbolText(oo.Symbol, avW);
+                    var txtft = MakeText(oo, oo.Text, avW);
+                    w = w + oo.Padding.Left + oo.Padding.Right + oo.Symbol.Padding.Left + oo.Symbol.Padding.Right + symbolft.Width + txtft.Width;
+                    h = h + oo.Padding.Top + oo.Padding.Bottom + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height + txtft.Height;
+                }
+                if (items[i] is TextBlockExElementArray tr)
+                {
+                    
+                    var tp = tr.ItemTemplate.LoadContent();
+                }
             }
+            
             if(availableSize.Width < w)
             {
                 w = availableSize.Width;
@@ -223,65 +236,69 @@ namespace QSoft.WPF.TextBlockT
             var symbol_y = 0.0;
             var text_y = 0.0;
             FormattedText? m_trimmingft = null;
-            for (int i=0; i< items.Count; i++)
+            for(int j=0;j<items.Count; j++)
             {
-                var item = items[i];
-                var w = avW - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
-                var symbolft = MakeSymbolText(item.Symbol, avW);
-                w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
-                var txtft = MakeText(item, item.Text, w);
-                
-                txtft.MaxTextHeight = avH - text_y;
-                symbol_y = symbol_y + item.Symbol.Padding.Top;
-                text_y = text_y + item.Padding.Top;
-                var symbolpt = new Point(item.Symbol.Padding.Left, symbol_y);
-                //if (txtft.Height > 0)
-                //{
-                //    dc.DrawText(symbolft, symbolpt);
-                //}
-                    
-                
-                var text_x = item.Symbol.Padding.Left +symbolft.WidthIncludingTrailingWhitespace + item.Symbol.Padding.Right + item.Padding.Left;
-                var textpt = new Point(text_x, text_y);
-                
-                //dc.DrawText(txtft, textpt);
-
-
-                
-
-                text_y = symbol_y = text_y + txtft.Height + item.Padding.Bottom;
-
-                if (txtft.Height == 0)
+                for (int i = 0; i < items[j].Elements.Length; i++)
                 {
-                    if(renderlist.Any())
+                    var item = items[j].Elements[i];
+                    var w = avW - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+                    var symbolft = MakeSymbolText(item.Symbol, avW);
+                    w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+                    var txtft = MakeText(item, item.Text, w);
+
+                    txtft.MaxTextHeight = avH - text_y;
+                    symbol_y = symbol_y + item.Symbol.Padding.Top;
+                    text_y = text_y + item.Padding.Top;
+                    var symbolpt = new Point(item.Symbol.Padding.Left, symbol_y);
+                    //if (txtft.Height > 0)
+                    //{
+                    //    dc.DrawText(symbolft, symbolpt);
+                    //}
+
+
+                    var text_x = item.Symbol.Padding.Left + symbolft.WidthIncludingTrailingWhitespace + item.Symbol.Padding.Right + item.Padding.Left;
+                    var textpt = new Point(text_x, text_y);
+
+                    //dc.DrawText(txtft, textpt);
+
+
+
+
+                    text_y = symbol_y = text_y + txtft.Height + item.Padding.Bottom;
+
+                    if (txtft.Height == 0)
                     {
-                        var aa = renderlist.Last();
-                        var aa1 = (aa.symbolpt, aa.textpt, aa.symbolft, m_trimmingft, true);
-                        renderlist.Remove(aa);
-                        renderlist.Add(aa1);
+                        if (renderlist.Any())
+                        {
+                            var aa = renderlist.Last();
+                            var aa1 = (aa.symbolpt, aa.textpt, aa.symbolft, m_trimmingft, true);
+                            renderlist.Remove(aa);
+                            renderlist.Add(aa1);
+                        }
+
+                        break;
                     }
-                    
-                    break;
+
+                    if (text_y > avH)
+                    {
+
+                        break;
+                    }
+                    m_trimmingft = MakeText(item, item.Text.TrimEnd() + " ...", w);
+                    m_trimmingft.MaxTextHeight = txtft.MaxTextHeight;
+                    renderlist.Add((symbolpt, textpt, symbolft, txtft, false));
                 }
 
-                if (text_y > avH)
+                foreach (var oo in renderlist)
                 {
-                   
-                    break;
-                }
-                m_trimmingft = MakeText(item, item.Text.TrimEnd() + " ...", w);
-                m_trimmingft.MaxTextHeight = txtft.MaxTextHeight;
-                renderlist.Add((symbolpt, textpt, symbolft, txtft, false));
-            }
+                    if (oo.txtft.Height > 0)
+                    {
+                        dc.DrawText(oo.symbolft, oo.symbolpt);
 
-            foreach(var oo in renderlist)
-            {
-                if (oo.txtft.Height > 0)
-                {
-                    dc.DrawText(oo.symbolft, oo.symbolpt);
-                    
+                    }
+                    dc.DrawText(oo.txtft, oo.textpt);
                 }
-                dc.DrawText(oo.txtft, oo.textpt);
+
             }
         }
     }

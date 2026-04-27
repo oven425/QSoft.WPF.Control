@@ -20,19 +20,12 @@ namespace QSoft.WPF.TextBlockT
         public MainWindow()
         {
             InitializeComponent();
+
+
             this.DataContext = new MainUI
             {
                 TotalSums =
                 [
-                    new() {
-                        Sum = "C# 型別選擇指南",
-                        Items = 
-                        [
-                            "class 是參考型別，實例配置於受 GC 管理的 Heap 記憶體中。它支援繼承、多型與介面實作，適合具有可變狀態、複雜行為或需要共享參考語意的物件模型，例如服務類別、ViewMode 或領域實體。",
-                            "struct 是實值型別，通常配置於 Stack 上，賦值時會進行完整的位元複製。它不支援繼承，適合封裝小型且語意上不可分割的資料，例如 Point、Color 或 DateTime，能有效避免 Heap 配置與 GC 壓力。",
-                            "record 是 C# 9 引入的型別，預設具備不可變性（immutable），編譯器會自動合成結構相等性比較（Equals、==）、GetHashCode、ToString 以及非破壞性複製的 with 運算式，非常適合用於資料傳輸物件（DTO）、事件酬載或任何以值語意為主的資料容器。"
-                        ]
-                    },
                     new() {
                         Sum = "C# 型別選擇指南",
                         Items =

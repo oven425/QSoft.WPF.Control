@@ -6,10 +6,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace QSoft.WPF.TextBlockT
 {
+    
+    public class TextBlockExElementBase:FrameworkElement
+    {
+        public virtual TextBlockExElement[] Elements => [];
+    }
+    [System.Windows.Markup.ContentProperty("List")]
+    public class TextBlockExElementArray : TextBlockExElement
+    {
+        public FreezableCollection<TextBlockExElement> List { set; get; } = [];
+        public BindingBase ItemsSource { get; set; }
+        public override TextBlockExElement[] Elements => [.. List];
+        public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(nameof(ItemTemplate), typeof(DataTemplate), typeof(TextBlockExElementArray));
+        public DataTemplate ItemTemplate
+        {
+            get => (DataTemplate)GetValue(PaddingProperty);
+            set => SetValue(PaddingProperty, value);
+        }
+
+
+    }
     public class Symbol:DependencyObject
     {
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(Symbol), new PropertyMetadata(""));
@@ -80,8 +101,9 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontWeightProperty, value);
         }
     }
-    public class TextBlockExElement : FrameworkContentElement
+    public class TextBlockExElement : TextBlockExElementBase
     {
+        public override TextBlockExElement[] Elements => [this];
         public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(Thickness), typeof(TextBlockExElement), new FrameworkPropertyMetadata(new Thickness()));
         public Thickness Padding
         {
