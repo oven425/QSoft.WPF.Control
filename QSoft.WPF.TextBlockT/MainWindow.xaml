@@ -54,11 +54,11 @@
                 <local:TextBlockExElementArray ItemsSource="{Binding TotalSums[2].Items}" >
                     <local:TextBlockExElementArray.ItemTemplate>
                         <DataTemplate>
-                            <local:TextBlockExElement Foreground="Blue" Text="{Binding}">
-                                <local:TextBlockExElement.Symbol>
-                                    <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
-                                </local:TextBlockExElement.Symbol>
-                            </local:TextBlockExElement>
+                            <local:TextBlockExElementDataTemplate>
+                                <local:TextBlockExElementDataTemplate.Element>
+                                    <local:TextBlockExElement/>
+                                </local:TextBlockExElementDataTemplate.Element>
+                            </local:TextBlockExElementDataTemplate>
                         </DataTemplate>
                     </local:TextBlockExElementArray.ItemTemplate>
 

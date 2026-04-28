@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using QRCoder;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -56,6 +57,9 @@ namespace WpfApp_PoS
         {
             if (this.m_MainUI != null) return;
             this.DataContext = this.m_MainUI = new MainUI();
+            this.m_MainUI.MailTo = "mailto:username@domainname?subject=SubjectText&body=Hi all,\r\nplease follow up\r\ntks";
+
+
             RequestLicense sj = new RequestLicense();
             sj.Version = 1;
             //HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS
@@ -80,8 +84,8 @@ namespace WpfApp_PoS
 
             this.m_MainUI.SendLicense = JsonSerializer.Serialize(sj, new JsonSerializerOptions() { WriteIndented = true });
 
-            GenerateQRCode($"mailto:test@yahoo.com?subject=Demo Credential&body={this.m_MainUI.SendLicense}");
-
+            //GenerateQRCode($"mailto:test@yahoo.com?subject=Demo Credential&body={this.m_MainUI.SendLicense}");
+            this.GenerateQRCode(this.m_MainUI.MailTo);
 
         }
 
@@ -102,6 +106,9 @@ namespace WpfApp_PoS
             QRCode qrCode = new QRCode(qrCodeData);
             Bitmap qrCodeImage = qrCode.GetGraphic(20);
             this.image.Source = ConvertBitmapToImageSource(qrCodeImage);
+
+            var emailChecker = new EmailAddressAttribute();
+            emailChecker.IsValid("aa@aa.bb");
         }
     }
 
@@ -132,6 +139,14 @@ namespace WpfApp_PoS
         {
             set { m_IsLicensePass = value; this.Update(); }
             get => m_IsLicensePass;
+        }
+
+        string m_MailTo;
+
+        public string MailTo
+        {
+            set { m_MailTo = value; this.Update(); }
+            get => m_MailTo;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

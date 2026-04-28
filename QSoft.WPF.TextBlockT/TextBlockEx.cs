@@ -182,7 +182,6 @@ namespace QSoft.WPF.TextBlockT
 
             double w = 0;
             double h = 0;
-            var ll = items.SelectMany(x => x.Elements, (x,y)=>new { x, y });
             for(int i=0; i<items.Count; i++)
             {
                 for(int j=0; j<items[i].Elements.Length; j++)

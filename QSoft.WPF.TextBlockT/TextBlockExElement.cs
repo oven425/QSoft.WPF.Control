@@ -16,6 +16,16 @@ namespace QSoft.WPF.TextBlockT
     {
         public virtual TextBlockExElement[] Elements => [];
     }
+
+    public class TextBlockExElementDataTemplate : DataTemplate
+    {
+        public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(TextBlockExElement), typeof(TextBlockExElementDataTemplate), new FrameworkPropertyMetadata(new Thickness()));
+        public TextBlockExElement Element
+        {
+            get => (TextBlockExElement)GetValue(PaddingProperty);
+            set => SetValue(PaddingProperty, value);
+        }
+    }
     [System.Windows.Markup.ContentProperty("List")]
     public class TextBlockExElementArray : TextBlockExElement
     {
