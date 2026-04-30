@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -17,29 +19,83 @@ namespace QSoft.WPF.TextBlockT
         public virtual TextBlockExElement[] Elements => [];
     }
 
-    public class TextBlockExElementDataTemplate : DataTemplate
-    {
-        public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(TextBlockExElement), typeof(TextBlockExElementDataTemplate), new FrameworkPropertyMetadata(new Thickness()));
-        public TextBlockExElement Element
-        {
-            get => (TextBlockExElement)GetValue(PaddingProperty);
-            set => SetValue(PaddingProperty, value);
-        }
-    }
     [System.Windows.Markup.ContentProperty("List")]
     public class TextBlockExElementArray : TextBlockExElement
     {
         public FreezableCollection<TextBlockExElement> List { set; get; } = [];
-        public BindingBase ItemsSource { get; set; }
+
         public override TextBlockExElement[] Elements => [.. List];
-        public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(nameof(ItemTemplate), typeof(DataTemplate), typeof(TextBlockExElementArray));
-        public DataTemplate ItemTemplate
+
+        public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register(
+                nameof(ItemsSource),
+                typeof(IEnumerable),
+                typeof(TextBlockExElementArray),
+                new PropertyMetadata(null, OnItemsSourceChanged));
+
+        public IEnumerable ItemsSource
         {
-            get => (DataTemplate)GetValue(PaddingProperty);
-            set => SetValue(PaddingProperty, value);
+            get => (IEnumerable)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
+        private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d is TextBlockExElementArray self)
+            {
+                if (e.OldValue is INotifyCollectionChanged oldCollection)
+                    oldCollection.CollectionChanged -= self.OnSourceCollectionChanged;
 
+                if (e.NewValue is INotifyCollectionChanged newCollection)
+                    newCollection.CollectionChanged += self.OnSourceCollectionChanged;
+                self.RefreshItems();
+            }
+               
+        }
+
+        private void OnSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            => RefreshItems();
+
+        public static readonly DependencyProperty ItemTemplateProperty =
+            DependencyProperty.Register(
+                nameof(ItemTemplate),
+                typeof(DataTemplate),
+                typeof(TextBlockExElementArray),
+                new PropertyMetadata(null, OnItemTemplateChanged));
+
+        public DataTemplate ItemTemplate
+        {
+            get => (DataTemplate)GetValue(ItemTemplateProperty);
+            set => SetValue(ItemTemplateProperty, value);
+        }
+
+        private static void OnItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            => ((TextBlockExElementArray)d).RefreshItems();
+
+        private void RefreshItems()
+        {
+            List.Clear();
+
+            if (ItemsSource == null) return;
+
+            foreach (var item in ItemsSource)
+            {
+                TextBlockExElement? element = null;
+
+                if (ItemTemplate != null)
+                {
+                    // 從 DataTemplate 實例化，並設定 DataContext 讓 {Binding} 生效
+                    element = ItemTemplate.LoadContent() as TextBlockExElement;
+                    if (element != null)
+                        element.DataContext = item;
+                }
+
+                // 沒有 ItemTemplate 時退而求其次：直接把值塞入 Text
+                element ??= new TextBlockExElement { Text = item?.ToString() ?? string.Empty };
+
+                List.Add(element);
+            }
+        }
     }
     public class Symbol:DependencyObject
     {
@@ -188,14 +244,43 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontStretchProperty, value);
         }
 
-        public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(nameof(Foreground), typeof(Brush),  typeof(TextBlockExElement), new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits));
-
+        //public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(nameof(Foreground), typeof(Brush),  typeof(TextBlockExElement), new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits|FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty ForegroundProperty =
+            TextBlockEx.ForegroundProperty.AddOwner(
+                typeof(TextBlockExElement),
+                new FrameworkPropertyMetadata(
+                    Brushes.Black,
+                    FrameworkPropertyMetadataOptions.Inherits |
+                    FrameworkPropertyMetadataOptions.AffectsRender, ForegroundPropertyChanged));
         public Brush Foreground
         {
             get => (Brush)GetValue(ForegroundProperty);
             set => SetValue(ForegroundProperty, value);
         }
 
+        private static void ForegroundPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is FrameworkElement fe && fe.Parent is TextBlockEx parent)
+            {
+                parent.InvalidateVisual();
+            }
+        }
+
+        //protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        //{
+        //    base.OnPropertyChanged(e);
+        //    DependencyObject? current = Parent;
+        //    while (current != null)
+        //    {
+        //        if (current is TextBlockEx textBlockEx)
+        //        {
+        //            textBlockEx.InvalidateMeasure();
+        //            textBlockEx.InvalidateVisual();
+        //            return;
+        //        }
+        //        current = (current as FrameworkElement)?.Parent;
+        //    }
+        //}
     }
 
 }

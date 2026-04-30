@@ -69,8 +69,7 @@ namespace QSoft.WPF.TextBlockT
 
         public static readonly DependencyProperty ForegroundProperty =
             DependencyProperty.Register(nameof(Foreground), typeof(Brush), typeof(TextBlockEx),
-                new FrameworkPropertyMetadata(Brushes.Black,
-                    FrameworkPropertyMetadataOptions.AffectsRender));
+                new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits|FrameworkPropertyMetadataOptions.AffectsRender));
 
         public Brush Foreground
         {
@@ -111,12 +110,12 @@ namespace QSoft.WPF.TextBlockT
         private static void OnItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctrl = (TextBlockEx)d;
-            if (e.OldValue is ObservableCollection<TextBlockExElement> old)
+            if (e.OldValue is ObservableCollection<TextBlockExElementBase> old)
             {
                 old.CollectionChanged -= ctrl.OnCollectionChanged;
                 foreach (var item in old) ctrl.RemoveLogicalChild(item);
             }
-            if (e.NewValue is ObservableCollection<TextBlockExElement> nw)
+            if (e.NewValue is ObservableCollection<TextBlockExElementBase> nw)
             {
                 foreach (var item in nw) ctrl.AddLogicalChild(item);
                 nw.CollectionChanged += ctrl.OnCollectionChanged;
@@ -125,10 +124,14 @@ namespace QSoft.WPF.TextBlockT
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            var ff = sender as FrameworkElement;
             if (e.OldItems != null)
-                foreach (TextBlockExElement item in e.OldItems) RemoveLogicalChild(item);
+                foreach (TextBlockExElementBase item in e.OldItems) RemoveLogicalChild(item);
             if (e.NewItems != null)
-                foreach (TextBlockExElement item in e.NewItems) AddLogicalChild(item);
+                foreach (TextBlockExElementBase item in e.NewItems)
+                {
+                    AddLogicalChild(item);
+                }
 
             InvalidateMeasure();
             InvalidateVisual();
@@ -192,11 +195,7 @@ namespace QSoft.WPF.TextBlockT
                     w = w + oo.Padding.Left + oo.Padding.Right + oo.Symbol.Padding.Left + oo.Symbol.Padding.Right + symbolft.Width + txtft.Width;
                     h = h + oo.Padding.Top + oo.Padding.Bottom + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height + txtft.Height;
                 }
-                if (items[i] is TextBlockExElementArray tr)
-                {
-                    
-                    var tp = tr.ItemTemplate.LoadContent();
-                }
+
             }
             
             if(availableSize.Width < w)

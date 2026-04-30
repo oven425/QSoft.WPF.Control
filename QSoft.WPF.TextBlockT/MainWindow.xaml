@@ -18,7 +18,7 @@
                 <Button>123</Button>
             </local:TextBlockEx.LeadingElement>
             <local:TextBlockEx.Items>
-                <!--<local:TextBlockExElement IndentLevel="0" FontSize="40" Text="C# 型別選擇指南">
+                <local:TextBlockExElement IndentLevel="0" FontSize="40" Text="C# 型別選擇指南">
                     <local:TextBlockExElement.Symbol>
                         <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,20,10,0"/>
                     </local:TextBlockExElement.Symbol>
@@ -44,24 +44,28 @@
                 </local:TextBlockExElement>
                 <local:TextBlockExElementArray>
                     <local:TextBlockExElementArray.List>
-                        <local:TextBlockExElement Foreground="Pink" Text="record 是 C# 9 引入的型別，預設具備不可變性（immutable），編譯器會自動合成結構相等性比較（Equals、==）、GetHashCode、ToString 以及非破壞性複製的 with 運算式，非常適合用於資料傳輸物件（DTO）、事件酬載或任何以值語意為主的資料容器。">
+                        <local:TextBlockExElement Foreground="Purple" Text="商品名稱：無線滑鼠 MX300（料號：MS-MX300-BK），目前剩餘庫存：3 件，安全庫存設定為 10 件，已觸發低庫存警示。建議儘速向供應商送出補貨申請，預估前置作業時間約 5 個工作天，請採購部門優先處理。">
+                            <local:TextBlockExElement.Symbol>
+                                <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
+                            </local:TextBlockExElement.Symbol>
+                        </local:TextBlockExElement>
+                        <local:TextBlockExElement Foreground="Purple" Text="商品名稱：機械鍵盤 KB-500（料號：KB-500-TKL），目前剩餘庫存：0 件，已完全缺貨。近 7 日平均出貨量為 4 件/天，缺貨損失風險極高，請立即聯繫原廠確認最快到貨時程，並評估是否需要臨時調貨支應。">
                             <local:TextBlockExElement.Symbol>
                                 <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
                             </local:TextBlockExElement.Symbol>
                         </local:TextBlockExElement>
                     </local:TextBlockExElementArray.List>
-                </local:TextBlockExElementArray>-->
-                <local:TextBlockExElementArray ItemsSource="{Binding TotalSums[2].Items}" >
+                </local:TextBlockExElementArray>
+                <local:TextBlockExElementArray ItemsSource="{Binding TotalSums[1].Items}">
                     <local:TextBlockExElementArray.ItemTemplate>
                         <DataTemplate>
-                            <local:TextBlockExElementDataTemplate>
-                                <local:TextBlockExElementDataTemplate.Element>
-                                    <local:TextBlockExElement/>
-                                </local:TextBlockExElementDataTemplate.Element>
-                            </local:TextBlockExElementDataTemplate>
+                            <local:TextBlockExElement Foreground="DarkGray" Text="{Binding}" IndentLevel="1">
+                                <local:TextBlockExElement.Symbol>
+                                    <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
+                                </local:TextBlockExElement.Symbol>
+                            </local:TextBlockExElement>
                         </DataTemplate>
                     </local:TextBlockExElementArray.ItemTemplate>
-
                 </local:TextBlockExElementArray>
             </local:TextBlockEx.Items>
         </local:TextBlockEx>
