@@ -5,136 +5,70 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QSoft.WPF.TreeListViewT"
              mc:Ignorable="d" 
+             x:Name="local"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <!--<LinearGradientBrush x:Key="BlueRinseBrush" StartPoint="0.5,0" EndPoint="0.5,1">
-            <GradientStop Color="#FF223B84" Offset="1"/>
-            <GradientStop Color="#FF57A0F4" Offset="0.5"/>
-            <GradientStop Color="#FF4B94EC" Offset="0.5"/>
-        </LinearGradientBrush>-->
-        <!--<Style x:Key="GridViewColumnHeaderGripper" TargetType="Thumb">
-            <Setter Property="Width" Value="18"/>
-            <Setter Property="Background" Value="White"/>
+        <Style x:Key="HeaderArrowStyle" TargetType="Path">
+            <Setter Property="Fill" Value="Gray"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0,0,0"/>
+        </Style>
+
+        <!--<Style TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Thumb}">
-                        <Border Background="Transparent" Padding="{TemplateBinding Padding}">
-                            <Rectangle HorizontalAlignment="Center" Width="3"
-                               Fill="{TemplateBinding Background}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
-        <Style x:Key="GridViewColumnHeaderStyle" TargetType="GridViewColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="GridViewColumnHeader">
+                    <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
                         <Grid>
-                            <Border x:Name="HeaderBorder" BorderThickness="1,1,0,1"
-                            BorderBrush="Red"
-                            Background="Green">
-                                <ContentPresenter x:Name="HeaderContent"
-                                          Margin="0,0,0,0"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          TextElement.Foreground="White"
-                                          RecognizesAccessKey="True"
-                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            <Border BorderThickness="0,0,1,1" BorderBrush="LightGray" Background="Transparent">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+                                    <ContentPresenter Content="{TemplateBinding Content}"/>
+                                    <Path x:Name="SortArrowUp" Style="{StaticResource HeaderArrowStyle}" 
+                                      Data="M 0 4 L 3.5 0 L 7 4 Z" Visibility="Collapsed"/>
+                                    <Path x:Name="SortArrowDown" Style="{StaticResource HeaderArrowStyle}" 
+                                      Data="M 0 0 L 3.5 4 L 7 0 Z" Visibility="Collapsed"/>
+                                </StackPanel>
                             </Border>
-                            <!--<Thumb x:Name="PART_HeaderGripper"
-                           HorizontalAlignment="Right"
-                           Margin="0,0,-9,0"
-                           Style="{StaticResource GridViewColumnHeaderGripper}"/>-->
                         </Grid>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="HeaderBorder" Property="Background" Value="Yellow"/>
-                                <Setter TargetName="HeaderContent" Property="TextElement.Foreground" Value="Black"/>
+                            <Trigger Property="Tag" Value="Ascending">
+                                <Setter TargetName="SortArrowUp" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Descending">
+                                <Setter TargetName="SortArrowDown" Property="Visibility" Value="Visible"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style x:Key="ss" TargetType="ScrollViewer">
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="0"/>
-        </Style>
-
-        <Style x:Key="NewTabGridViewScrollViewerStyle" TargetType="ScrollViewer">
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ScrollViewer">
-                        <Grid Margin="0,-1,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <DockPanel>
-                                <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Focusable="false">
-                                    <GridViewHeaderRowPresenter  Columns="{Binding Path=TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ColumnHeaderContainerStyle="{Binding Path=TemplatedParent.View.ColumnHeaderContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ColumnHeaderTemplate="{Binding Path=TemplatedParent.View.ColumnHeaderTemplate, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ColumnHeaderTemplateSelector="{Binding Path=TemplatedParent.View.ColumnHeaderTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
-                                    AllowsColumnReorder="{Binding Path=TemplatedParent.View.AllowsColumnReorder, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ColumnHeaderContextMenu="{Binding Path=TemplatedParent.View.ColumnHeaderContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ColumnHeaderToolTip="{Binding Path=TemplatedParent.View.ColumnHeaderToolTip, RelativeSource={RelativeSource TemplatedParent}}"
-                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                </ScrollViewer>
-
-                                <ScrollContentPresenter Name="PART_ScrollContentPresenter" KeyboardNavigation.DirectionalNavigation="Local"/>
-                            </DockPanel>
-
-                            <ScrollBar Name="PART_HorizontalScrollBar" Orientation="Horizontal" Grid.Row="1" Maximum="{TemplateBinding ScrollableWidth}" ViewportSize="{TemplateBinding ViewportWidth}" Value="{TemplateBinding HorizontalOffset}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
-                            <ScrollBar Name="PART_VerticalScrollBar" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Value="{TemplateBinding VerticalOffset}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-
-
-        <Style x:Key="NewTabListViewStyle" TargetType="ListView">
-            <Setter Property="Background" Value="Red"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListView">
-                        <Border Name="Border" Background="red">
-                            <ScrollViewer Style="{StaticResource NewTabGridViewScrollViewerStyle}">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        </Style>-->
 
     </UserControl.Resources>
     <Grid>
-        <ListView Style="{StaticResource NewTabListViewStyle}" SizeChanged="listview_SizeChanged" >
+        <ListView ItemsSource="{Binding Datas}" SizeChanged="listview_SizeChanged" >
             <ListView.View>
                 <GridView x:Name="gridview">
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="200"/>
-                    <GridViewColumn Header="Age" DisplayMemberBinding="{Binding Age}" Width="100"/>
-                    <GridViewColumn Header="City" DisplayMemberBinding="{Binding City}" Width="150"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Name}" Width="200">
+                        <GridViewColumn.Header >
+                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Name" >Name</GridViewColumnHeader>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Width="100">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Age">Age</GridViewColumnHeader>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Time}" Width="150">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Time">Time</GridViewColumnHeader>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Width="100" Command="{Binding DataContext.DeleteCommand, ElementName=local}">Delete</Button>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
