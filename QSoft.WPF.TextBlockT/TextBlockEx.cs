@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace QSoft.WPF.TextBlockT
@@ -13,6 +14,73 @@ namespace QSoft.WPF.TextBlockT
     
     public class TextBlockEx : FrameworkElement
     {
+        public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register(
+                nameof(ItemsSource),
+                typeof(IEnumerable),
+                typeof(TextBlockEx),
+                new PropertyMetadata(null, OnItemsSourceChanged));
+
+        public IEnumerable ItemsSource
+        {
+            get => (IEnumerable)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
+        }
+
+        private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TextBlockEx self)
+            {
+                if (e.OldValue is INotifyCollectionChanged oldCollection)
+                    oldCollection.CollectionChanged -= self.OnSourceCollectionChanged;
+
+                if (e.NewValue is INotifyCollectionChanged newCollection)
+                    newCollection.CollectionChanged += self.OnSourceCollectionChanged;
+                self.RefreshItems();
+            }
+
+        }
+
+        private void OnSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            => RefreshItems();
+
+        public static readonly DependencyProperty ItemTemplateProperty =
+            DependencyProperty.Register(
+                nameof(ItemTemplate),
+                typeof(DataTemplate),
+                typeof(TextBlockEx),
+                new PropertyMetadata(null, OnItemTemplateChanged));
+
+        public DataTemplate ItemTemplate
+        {
+            get => (DataTemplate)GetValue(ItemTemplateProperty);
+            set => SetValue(ItemTemplateProperty, value);
+        }
+
+        private static void OnItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            => ((TextBlockEx)d).RefreshItems();
+
+        private void RefreshItems()
+        {
+            this.Items.Clear();
+
+            if (ItemsSource == null) return;
+
+            foreach (var item in ItemsSource)
+            {
+                TextBlockExElementBase? element = null;
+
+                if (ItemTemplate != null)
+                {
+                    element = ItemTemplate.LoadContent() as TextBlockExElementBase;
+                    if (element != null)
+                        element.DataContext = item;
+                }
+                element ??= new TextBlockExElement { Text = item?.ToString() ?? string.Empty };
+                this.Items.Add(element);
+            }
+        }
+
         public static readonly DependencyProperty LeadingElementProperty =  DependencyProperty.Register(nameof(LeadingElement), typeof(UIElement), typeof(TextBlockEx),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnLeadingElementChanged));
 

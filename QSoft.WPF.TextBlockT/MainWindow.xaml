@@ -12,8 +12,9 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <local:TextBlockEx FontSize="13" Foreground="Black" FontFamily="Segoe UI">
+        <!--<local:TextBlockEx FontSize="13" Foreground="Black" FontFamily="Segoe UI">
             <local:TextBlockEx.LeadingElement>
                 <Button>123</Button>
             </local:TextBlockEx.LeadingElement>
@@ -68,10 +69,39 @@
                     </local:TextBlockExElementArray.ItemTemplate>
                 </local:TextBlockExElementArray>
             </local:TextBlockEx.Items>
-        </local:TextBlockEx>
-        
+        </local:TextBlockEx>-->
 
-        <TextBlock Grid.Row="1">
+        <local:TextBlockEx ItemsSource="{Binding TotalSums}" FontSize="13" Foreground="Black" FontFamily="Segoe UI" Grid.Row="1">
+            <local:TextBlockEx.LeadingElement>
+                <Button>123</Button>
+            </local:TextBlockEx.LeadingElement>
+            <local:TextBlockEx.ItemTemplate>
+                <DataTemplate>
+                    <local:TextBlockExElementGroup>
+                        <local:TextBlockExElement IndentLevel="0" FontSize="40" Text="{Binding Sum}">
+                            <local:TextBlockExElement.Symbol>
+                                <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,20,10,0"/>
+                            </local:TextBlockExElement.Symbol>
+                            <local:TextBlockExElement.FontWeight>Bold</local:TextBlockExElement.FontWeight>
+                        </local:TextBlockExElement>
+                        <local:TextBlockExElementArray ItemsSource="{Binding Items}">
+                            <local:TextBlockExElementArray.ItemTemplate>
+                                <DataTemplate>
+                                    <local:TextBlockExElement Foreground="DarkGray" Text="{Binding}" IndentLevel="1">
+                                        <local:TextBlockExElement.Symbol>
+                                            <local:Symbol Text="•" FontSize="12" VerticalAlignment="Top" Padding="20,3,10,0"/>
+                                        </local:TextBlockExElement.Symbol>
+                                    </local:TextBlockExElement>
+                                </DataTemplate>
+                            </local:TextBlockExElementArray.ItemTemplate>
+                        </local:TextBlockExElementArray>
+                    </local:TextBlockExElementGroup>
+                    
+                </DataTemplate>
+            </local:TextBlockEx.ItemTemplate>
+        </local:TextBlockEx>
+
+        <TextBlock Grid.Row="2">
             <Run>AAAAA</Run>
             <Run FontSize="36">AAAAA</Run>
             <Run>AAAAA</Run>

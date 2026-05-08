@@ -37,12 +37,13 @@ namespace QSoft.WPF.TreeListViewT
             var listview = (ListView)sender;
             var gridview = listview.View as GridView;
             
-            var w = listview.ActualWidth / gridview.Columns.Count;
+            var w = (listview.ActualWidth) / gridview.Columns.Count;
             foreach(GridViewColumn oo in gridview.Columns)
             {
                 
                 oo.Width = w;
             }
+            
         }
 
 
@@ -68,28 +69,37 @@ namespace QSoft.WPF.TreeListViewT
         [RelayCommand]
         void Sort(string dp)
         {
-            if(SortColumn is null || SortColumn.Name != dp)
+            if (SortColumn is null || SortColumn.Name != dp)
             {
                 SortColumn = new SortColumn()
                 {
                     Name = dp,
-                    Direction = SortDirection.Ascending
+                    Direction = ListSortDirection.Ascending
                 };
             }
             else
             {
-                if (SortColumn.Direction == SortDirection.Ascending)
+                if (SortColumn.Direction == ListSortDirection.Ascending)
                 {
-                    SortColumn.Direction = SortDirection.Descending;
+                    SortColumn = new SortColumn()
+                    {
+                        Name = dp,
+                        Direction = ListSortDirection.Descending
+                    };
                 }
-                else if (SortColumn.Direction == SortDirection.Descending)
+                else if (SortColumn.Direction == ListSortDirection.Descending)
                 {
-                    SortColumn.Direction = SortDirection.Ascending;
+                    SortColumn = new SortColumn()
+                    {
+                        Name = dp,
+                        Direction = ListSortDirection.Ascending
+                    };
                 }
             }
+
             var dataView = CollectionViewSource.GetDefaultView(this.Datas);
             dataView.SortDescriptions.Clear();
-            var sd = new SortDescription(dp, ListSortDirection.Descending);
+            var sd = new SortDescription(dp, SortColumn.Direction);
             dataView.SortDescriptions.Add(sd);
             dataView.Refresh();
         }
@@ -98,15 +108,10 @@ namespace QSoft.WPF.TreeListViewT
     public class SortColumn
     {
         public string Name { get; set; }
-        public SortDirection Direction { get; set; }
+        public ListSortDirection Direction { get; set; }
     }
 
-    public enum SortDirection
-    {   
-        None,
-        Ascending,
-        Descending
-    }
+
 
     public class Data
     {
@@ -115,7 +120,18 @@ namespace QSoft.WPF.TreeListViewT
         public DateTime Time { set; get; }
     }
 
+    public class SortColumnTagConverter : IValueConverter
+    {
+        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is SortColumn sc && parameter is string colName && sc.Name == colName)
+                return sc.Direction == ListSortDirection.Ascending ? "Asc" : "Desc";
+            return null;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
     public class Aquarium : UIElement
     {
         // Register an attached dependency property with the specified

@@ -19,6 +19,35 @@ namespace QSoft.WPF.TextBlockT
         public virtual TextBlockExElement[] Elements => [];
     }
 
+    [System.Windows.Markup.ContentProperty("Children")]
+    public class TextBlockExElementGroup : TextBlockExElementBase
+    {
+        public FreezableCollection<TextBlockExElementBase> Children { get; set; } = [];
+
+        public override TextBlockExElement[] Elements =>
+            [.. Children.SelectMany(c => c.Elements)];
+
+        public TextBlockExElementGroup()
+        {
+            DataContextChanged += OnDataContextChanged;
+        }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            foreach (var child in Children)
+                child.DataContext = e.NewValue;
+        }
+
+        private void OnChildrenChanged(object? sender, EventArgs e)
+        {
+            foreach (var child in Children)
+            {
+                if (child.DataContext != DataContext)
+                    child.DataContext = DataContext;
+            }
+        }
+    }
+
     [System.Windows.Markup.ContentProperty("List")]
     public class TextBlockExElementArray : TextBlockExElement
     {
@@ -265,22 +294,6 @@ namespace QSoft.WPF.TextBlockT
                 parent.InvalidateVisual();
             }
         }
-
-        //protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-        //{
-        //    base.OnPropertyChanged(e);
-        //    DependencyObject? current = Parent;
-        //    while (current != null)
-        //    {
-        //        if (current is TextBlockEx textBlockEx)
-        //        {
-        //            textBlockEx.InvalidateMeasure();
-        //            textBlockEx.InvalidateVisual();
-        //            return;
-        //        }
-        //        current = (current as FrameworkElement)?.Parent;
-        //    }
-        //}
     }
 
 }

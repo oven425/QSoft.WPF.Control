@@ -8,18 +8,19 @@
              x:Name="local"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <local:SortColumnTagConverter x:Key="sortcolumn2Path"/>
         <Style x:Key="HeaderArrowStyle" TargetType="Path">
             <Setter Property="Fill" Value="Gray"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5,0,0,0"/>
         </Style>
 
-        <!--<Style TargetType="{x:Type GridViewColumnHeader}">
+        <Style TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
                         <Grid>
-                            <Border BorderThickness="0,0,1,1" BorderBrush="LightGray" Background="Transparent">
+                            <Border BorderThickness="1" BorderBrush="LightGray" Background="Transparent">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                                     <ContentPresenter Content="{TemplateBinding Content}"/>
                                     <Path x:Name="SortArrowUp" Style="{StaticResource HeaderArrowStyle}" 
@@ -30,36 +31,125 @@
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="Tag" Value="Ascending">
+                            <Trigger Property="Tag" Value="Asc">
                                 <Setter TargetName="SortArrowUp" Property="Visibility" Value="Visible"/>
                             </Trigger>
-                            <Trigger Property="Tag" Value="Descending">
+                            <Trigger Property="Tag" Value="Desc">
                                 <Setter TargetName="SortArrowDown" Property="Visibility" Value="Visible"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>-->
+        </Style>
+
+        <Style x:Key="{x:Static GridView.GridViewScrollViewerStyleKey}"
+           TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <DockPanel Margin="{TemplateBinding Padding}">
+                                <ScrollViewer DockPanel.Dock="Top"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          Focusable="false">
+                                    <GridViewHeaderRowPresenter 
+                                                            Columns="{Binding Path=TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}"
+                                                            ColumnHeaderContainerStyle="{Binding Path=TemplatedParent.View.ColumnHeaderContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
+                                                            ColumnHeaderTemplate="{Binding Path=TemplatedParent.View.ColumnHeaderTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                            ColumnHeaderTemplateSelector="{Binding Path=TemplatedParent.View.ColumnHeaderTemplateSelector,RelativeSource={RelativeSource TemplatedParent}}"
+                                                            AllowsColumnReorder="{Binding Path=TemplatedParent.View.AllowsColumnReorder,RelativeSource={RelativeSource TemplatedParent}}"
+                                                            ColumnHeaderContextMenu="{Binding Path=TemplatedParent.View.ColumnHeaderContextMenu,RelativeSource={RelativeSource TemplatedParent}}"
+                                                            ColumnHeaderToolTip="{Binding Path=TemplatedParent.View.ColumnHeaderToolTip,RelativeSource={RelativeSource TemplatedParent}}"
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </ScrollViewer>
+
+                                <ScrollContentPresenter Name="PART_ScrollContentPresenter"
+                                                    KeyboardNavigation.DirectionalNavigation="Local"
+                                                    CanContentScroll="True"
+                                                    CanHorizontallyScroll="False"
+                                                    CanVerticallyScroll="False" />
+                            </DockPanel>
+
+                            <ScrollBar Name="PART_HorizontalScrollBar"
+                                   Orientation="Horizontal"
+                                   Grid.Row="1"
+                                   Maximum="{TemplateBinding ScrollableWidth}"
+                                   ViewportSize="{TemplateBinding ViewportWidth}"
+                                   Value="{TemplateBinding HorizontalOffset}"
+                                   Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+
+                            <ScrollBar Name="PART_VerticalScrollBar"
+                                   Grid.Column="1"
+                                   Maximum="{TemplateBinding ScrollableHeight}"
+                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Value="{TemplateBinding VerticalOffset}"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ListView}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
+            <Setter Property="ScrollViewer.PanningMode" Value="Both" />
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListView}">
+                        <Border x:Name="Bd"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            Padding="1"
+                            SnapsToDevicePixels="True">
+                            <ScrollViewer Style="{DynamicResource {x:Static GridView.GridViewScrollViewerStyleKey}}">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     </UserControl.Resources>
     <Grid>
-        <ListView ItemsSource="{Binding Datas}" SizeChanged="listview_SizeChanged" >
+        <ListView ItemsSource="{Binding Datas}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SizeChanged="listview_SizeChanged" >
             <ListView.View>
                 <GridView x:Name="gridview">
                     <GridViewColumn DisplayMemberBinding="{Binding Name}" Width="200">
                         <GridViewColumn.Header >
-                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Name" >Name</GridViewColumnHeader>
+                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Name"
+                                                  Tag="{Binding DataContext.SortColumn, ElementName=local, Converter={StaticResource sortcolumn2Path}, ConverterParameter=Name}">Name</GridViewColumnHeader>
                         </GridViewColumn.Header>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Age}" Width="100">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Age">Age</GridViewColumnHeader>
+                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Age"
+                                    Tag="{Binding DataContext.SortColumn, ElementName=local, Converter={StaticResource sortcolumn2Path}, ConverterParameter=Age}">Age</GridViewColumnHeader>
                         </GridViewColumn.Header>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Time}" Width="150">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Time">Time</GridViewColumnHeader>
+                            <GridViewColumnHeader Command="{Binding DataContext.SortCommand, ElementName=local}" CommandParameter="Time"
+                                                  Tag="{Binding DataContext.SortColumn, ElementName=local, Converter={StaticResource sortcolumn2Path}, ConverterParameter=Time}">Time</GridViewColumnHeader>
                         </GridViewColumn.Header>
                     </GridViewColumn>
                     <GridViewColumn>
