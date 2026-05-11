@@ -103,12 +103,46 @@ namespace WpfApp_PoS
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
-            Bitmap qrCodeImage = qrCode.GetGraphic(20);
-            this.image.Source = ConvertBitmapToImageSource(qrCodeImage);
-
-            var emailChecker = new EmailAddressAttribute();
-            emailChecker.IsValid("aa@aa.bb");
+            
+            var qrCodeAsVariant = qrCodeData.ModuleMatrix;
+            
+            DrawingGroup drawingGroup = new DrawingGroup();
+            System.Windows.Media.Brush blackBrush = new SolidColorBrush(Colors.Black);
+            System.Windows.Media.Brush whiteBrush = new SolidColorBrush(Colors.White);
+            
+            double pixelSize = 10;
+            
+            drawingGroup.Children.Add(
+                new GeometryDrawing(whiteBrush, null,
+                    new RectangleGeometry(new Rect(0, 0, 
+                        qrCodeAsVariant.Count * pixelSize, 
+                        qrCodeAsVariant.Count * pixelSize)))
+            );
+            
+            PathGeometry pathGeometry = new PathGeometry();
+            
+            for (int y = 0; y < qrCodeAsVariant.Count; y++)
+            {
+                for (int x = 0; x < qrCodeAsVariant[y].Count; x++)
+                {
+                    if (qrCodeAsVariant[y][x])
+                    {
+                        var rect = new RectangleGeometry(
+                            new Rect(x * pixelSize, y * pixelSize, pixelSize, pixelSize));
+                        pathGeometry = Geometry.Combine(pathGeometry, rect, 
+                            GeometryCombineMode.Union, null);
+                    }
+                }
+            }
+            
+            drawingGroup.Children.Add(
+                new GeometryDrawing(blackBrush, null, pathGeometry)
+            );
+            
+            DrawingImage drawingImage = new DrawingImage(drawingGroup);
+            RenderOptions.SetEdgeMode(drawingImage, EdgeMode.Aliased);
+            drawingImage.Freeze();
+            this.image.Source = drawingImage;
         }
     }
 
