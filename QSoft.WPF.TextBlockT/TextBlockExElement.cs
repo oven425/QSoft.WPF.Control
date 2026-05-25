@@ -14,7 +14,7 @@ using System.Windows.Media;
 namespace QSoft.WPF.TextBlockT
 {
     
-    public class TextBlockExElementBase:FrameworkElement
+    public class TextBlockExElementBase: FrameworkContentElement
     {
         public virtual TextBlockExElement[] Elements => [];
     }
@@ -49,7 +49,7 @@ namespace QSoft.WPF.TextBlockT
     }
 
     [System.Windows.Markup.ContentProperty("List")]
-    public class TextBlockExElementArray : TextBlockExElement
+    public class TextBlockExElementArray : TextBlockExElementBase
     {
         public FreezableCollection<TextBlockExElement> List { set; get; } = [];
 
