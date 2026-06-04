@@ -113,20 +113,18 @@ namespace QSoft.WPF.TextBlockT
 
                 if (ItemTemplate != null)
                 {
-                    // 從 DataTemplate 實例化，並設定 DataContext 讓 {Binding} 生效
                     element = ItemTemplate.LoadContent() as TextBlockExElement;
                     if (element != null)
                         element.DataContext = item;
                 }
 
-                // 沒有 ItemTemplate 時退而求其次：直接把值塞入 Text
                 element ??= new TextBlockExElement { Text = item?.ToString() ?? string.Empty };
 
                 List.Add(element);
             }
         }
     }
-    public class Symbol:DependencyObject
+    public class Symbol: TextBlockExElementBase
     {
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(Symbol), new PropertyMetadata(""));
         public string Text
@@ -142,18 +140,27 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontSizeProperty, value);
         }
 
-        public static readonly DependencyProperty VerticalAlignmentProperty = DependencyProperty.Register(nameof(VerticalAlignment), typeof(VerticalAlignment), typeof(Symbol), new FrameworkPropertyMetadata(VerticalAlignment.Top));
-        public VerticalAlignment VerticalAlignment
-        {
-            get => (VerticalAlignment)GetValue(VerticalAlignmentProperty);
-            set => SetValue(VerticalAlignmentProperty, value);
-        }
+        //public static readonly DependencyProperty VerticalAlignmentProperty = DependencyProperty.Register(nameof(VerticalAlignment), typeof(VerticalAlignment), typeof(Symbol), new FrameworkPropertyMetadata(VerticalAlignment.Top));
+        //public VerticalAlignment VerticalAlignment
+        //{
+        //    get => (VerticalAlignment)GetValue(VerticalAlignmentProperty);
+        //    set => SetValue(VerticalAlignmentProperty, value);
+        //}
 
-        public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(Thickness), typeof(Symbol), new FrameworkPropertyMetadata(new Thickness()));
+        public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(Thickness), typeof(Symbol), new FrameworkPropertyMetadata(new Thickness(), PropertyChanged_Measure));
         public Thickness Padding
         {
             get => (Thickness)GetValue(PaddingProperty);
             set => SetValue(PaddingProperty, value);
+        }
+
+        static void PropertyChanged_Measure(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            if (obj is FrameworkContentElement fe && fe.Parent is TextBlockExElement te && te.Parent is TextBlockEx parent)
+            {
+                parent.InvalidateMeasure();
+                parent.InvalidateVisual();
+            }
         }
 
         public static readonly DependencyProperty FontFamilyProperty = DependencyProperty.Register(nameof(FontFamily), typeof(FontFamily), typeof(Symbol), new FrameworkPropertyMetadata(new FontFamily("Arial"), FrameworkPropertyMetadataOptions.Inherits));
@@ -180,12 +187,20 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontStretchProperty, value);
         }
 
-        public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(nameof(Foreground), typeof(Brush), typeof(Symbol), new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits));
+        public static readonly DependencyProperty ForegroundProperty = TextBlockExElement.ForegroundProperty.AddOwner(typeof(Symbol), new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits, PropertyChanged_Visual));
 
         public Brush Foreground
         {
             get => (Brush)GetValue(ForegroundProperty);
             set => SetValue(ForegroundProperty, value);
+        }
+
+        private static void PropertyChanged_Visual(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is FrameworkContentElement fe && fe.Parent is TextBlockExElement te && te.Parent is TextBlockEx parent)
+            {
+                parent.InvalidateVisual();
+            }
         }
 
         public static readonly DependencyProperty FontWeightProperty = DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(Symbol), new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits));
@@ -205,7 +220,7 @@ namespace QSoft.WPF.TextBlockT
             get => (Thickness)GetValue(PaddingProperty);
             set => SetValue(PaddingProperty, value);
         }
-        public static readonly DependencyProperty SymbolProperty = DependencyProperty.Register(nameof(Symbol), typeof(Symbol), typeof(TextBlockExElement), new PropertyMetadata());
+        public static readonly DependencyProperty SymbolProperty = DependencyProperty.Register(nameof(Symbol), typeof(Symbol), typeof(TextBlockExElement), new PropertyMetadata(SymbolPropertyChanged));
 
         public Symbol Symbol
         {
@@ -213,23 +228,37 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(SymbolProperty, value);
         }
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(TextBlockExElement), new PropertyMetadata(string.Empty));
+        private static void SymbolPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var owner = (TextBlockExElement)d;
+            if (e.OldValue is Symbol oldSymbol)
+            {
+                owner.RemoveLogicalChild(oldSymbol);
+            }
+            if (e.NewValue is Symbol newSymbol)
+            {
+                owner.AddLogicalChild(newSymbol);
+            }
+            PropertyChanged_Measure(d, e);
+        }
 
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(TextBlockExElement), new PropertyMetadata(string.Empty, PropertyChanged_Measure));
         public string Text
         {
             get => (string)GetValue(TextProperty);
             set => SetValue(TextProperty, value);
         }
 
-        public static readonly DependencyProperty IndentLevelProperty = DependencyProperty.Register(nameof(IndentLevel), typeof(int), typeof(TextBlockExElement), new PropertyMetadata(0));
-
-        public int IndentLevel
+        static void PropertyChanged_Measure(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            get => (int)GetValue(IndentLevelProperty);
-            set => SetValue(IndentLevelProperty, value);
+            if (obj is FrameworkContentElement fe && fe.Parent is TextBlockEx parent)
+            {
+                parent.InvalidateMeasure();
+                parent.InvalidateVisual();
+            }
         }
 
-        public static readonly DependencyProperty FontWeightProperty = DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(TextBlockExElement), new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits));
+        public static readonly DependencyProperty FontWeightProperty =  TextBlockEx.FontWeightProperty.AddOwner(typeof(TextBlockExElement), new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits, PropertyChanged_Measure));
 
         public FontWeight FontWeight
         {
@@ -237,27 +266,21 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontWeightProperty, value);
         }
 
-        public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register(nameof(FontSize), typeof(double),
-                typeof(TextBlockExElement),
-                new FrameworkPropertyMetadata(12.0,
-                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsRender));
-
+        public static readonly DependencyProperty FontSizeProperty = TextBlockEx.FontSizeProperty.AddOwner(typeof(TextBlockExElement), new FrameworkPropertyMetadata(12.0, FrameworkPropertyMetadataOptions.Inherits, PropertyChanged_Measure));
         public double FontSize
         {
             get => (double)GetValue(FontSizeProperty);
             set => SetValue(FontSizeProperty, value);
         }
 
-        public static readonly DependencyProperty FontFamilyProperty = DependencyProperty.Register(nameof(FontFamily), typeof(FontFamily), typeof(TextBlockExElement), new FrameworkPropertyMetadata(new FontFamily("Arial"), FrameworkPropertyMetadataOptions.Inherits));
-
+        public static readonly DependencyProperty FontFamilyProperty = TextBlockEx.FontFamilyProperty.AddOwner(typeof(TextBlockExElement), new FrameworkPropertyMetadata(new FontFamily("Arial"), FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsRender, PropertyChanged_Measure));
         public FontFamily FontFamily
         {
             get => (FontFamily)GetValue(FontFamilyProperty);
             set => SetValue(FontFamilyProperty, value);
         }
 
-        public static readonly DependencyProperty FontStyleProperty = DependencyProperty.Register(nameof(FontStyle), typeof(FontStyle), typeof(TextBlockExElement), new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits));
+        public static readonly DependencyProperty FontStyleProperty = TextBlockEx.FontStyleProperty.AddOwner(typeof(TextBlockExElement), new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsRender, PropertyChanged_Measure));
 
         public FontStyle FontStyle
         {
@@ -265,7 +288,7 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontStyleProperty, value);
         }
 
-        public static readonly DependencyProperty FontStretchProperty = DependencyProperty.Register(nameof(FontStretch), typeof(FontStretch), typeof(TextBlockExElement), new FrameworkPropertyMetadata(FontStretches.Normal, FrameworkPropertyMetadataOptions.Inherits));
+        public static readonly DependencyProperty FontStretchProperty = TextBlockEx.FontStretchProperty.AddOwner(typeof(TextBlockExElement), new FrameworkPropertyMetadata(FontStretches.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsRender, PropertyChanged_Measure));
 
         public FontStretch FontStretch
         {
@@ -273,23 +296,18 @@ namespace QSoft.WPF.TextBlockT
             set => SetValue(FontStretchProperty, value);
         }
 
-        //public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(nameof(Foreground), typeof(Brush),  typeof(TextBlockExElement), new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits|FrameworkPropertyMetadataOptions.AffectsRender));
         public static readonly DependencyProperty ForegroundProperty =
-            TextBlockEx.ForegroundProperty.AddOwner(
-                typeof(TextBlockExElement),
-                new FrameworkPropertyMetadata(
-                    Brushes.Black,
-                    FrameworkPropertyMetadataOptions.Inherits |
-                    FrameworkPropertyMetadataOptions.AffectsRender, ForegroundPropertyChanged));
+            TextBlockEx.ForegroundProperty.AddOwner(typeof(TextBlockExElement),
+                new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsRender, PropertyChanged_Visual));
         public Brush Foreground
         {
             get => (Brush)GetValue(ForegroundProperty);
             set => SetValue(ForegroundProperty, value);
         }
 
-        private static void ForegroundPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PropertyChanged_Visual(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is FrameworkElement fe && fe.Parent is TextBlockEx parent)
+            if (d is FrameworkContentElement fe && fe.Parent is TextBlockEx parent)
             {
                 parent.InvalidateVisual();
             }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Windows;
@@ -122,7 +123,7 @@ namespace QSoft.WPF.TextBlockT
             get => (ObservableCollection<TextBlockExElementBase>)GetValue(ItemsProperty);
             set => SetValue(ItemsProperty, value);
         }
-
+        
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(TextBlockEx),
                 new FrameworkPropertyMetadata(12.0,
@@ -165,6 +166,30 @@ namespace QSoft.WPF.TextBlockT
         {
             get => (FontFamily)GetValue(FontFamilyProperty);
             set => SetValue(FontFamilyProperty, value);
+        }
+
+        public static readonly DependencyProperty FontWeightProperty = DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(TextBlockEx), new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits));
+
+        public FontWeight FontWeight
+        {
+            get => (FontWeight)GetValue(FontWeightProperty);
+            set => SetValue(FontWeightProperty, value);
+        }
+
+        public static readonly DependencyProperty FontStyleProperty = DependencyProperty.Register(nameof(FontStyle), typeof(FontStyle), typeof(TextBlockEx), new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits));
+
+        public FontStyle FontStyle
+        {
+            get => (FontStyle)GetValue(FontStyleProperty);
+            set => SetValue(FontStyleProperty, value);
+        }
+
+        public static readonly DependencyProperty FontStretchProperty = DependencyProperty.Register(nameof(FontStretch), typeof(FontStretch), typeof(TextBlockEx), new FrameworkPropertyMetadata(FontStretches.Normal, FrameworkPropertyMetadataOptions.Inherits));
+
+        public FontStretch FontStretch
+        {
+            get => (FontStretch)GetValue(FontStretchProperty);
+            set => SetValue(FontStretchProperty, value);
         }
 
         public TextBlockEx()
@@ -258,12 +283,28 @@ namespace QSoft.WPF.TextBlockT
                 for(int j=0; j<items[i].Elements.Length; j++)
                 {
                     var oo = items[i].Elements[j];
-                    var symbolft = MakeSymbolText(oo.Symbol, avW);
+                    //var symbolft = MakeSymbolText(oo.Symbol, avW);
+                    //var txtft = MakeText(oo, oo.Text, avW);
+                    //w = w + oo.Padding.Left + oo.Padding.Right + oo.Symbol.Padding.Left + oo.Symbol.Padding.Right + symbolft.Width + txtft.Width;
+                    //h = h + oo.Padding.Top + oo.Padding.Bottom + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height + txtft.Height;
+
+
                     var txtft = MakeText(oo, oo.Text, avW);
-                    w = w + oo.Padding.Left + oo.Padding.Right + oo.Symbol.Padding.Left + oo.Symbol.Padding.Right + symbolft.Width + txtft.Width;
-                    h = h + oo.Padding.Top + oo.Padding.Bottom + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height + txtft.Height;
+                    w = w + oo.Padding.Left + oo.Padding.Right +  txtft.Width;
+                    h = h + oo.Padding.Top + oo.Padding.Bottom +  txtft.Height;
+                    if(oo.Symbol!=null)
+                    {
+                        var symbolft = MakeSymbolText(oo.Symbol, avW);
+                        w = w + oo.Symbol.Padding.Left + oo.Symbol.Padding.Right + symbolft.Width;
+                        h = h + oo.Symbol.Padding.Top + oo.Symbol.Padding.Bottom + symbolft.Height;
+                    }
+
                 }
 
+            }
+            if(LeadingElement != null)
+            {
+                w = w + LeadingElement.DesiredSize.Width;
             }
             
             if(availableSize.Width < w)
@@ -279,7 +320,6 @@ namespace QSoft.WPF.TextBlockT
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            // 排版到左上角 (0, 0)
             if (LeadingElement is not null)
             {
                 var desired = LeadingElement.DesiredSize;
@@ -293,11 +333,15 @@ namespace QSoft.WPF.TextBlockT
             dc.DrawRectangle(Background, null, new Rect(0, 0, ActualWidth, ActualHeight));
             var items = Items;
             if (items is null || items.Count == 0) return;
-
-            double avW = ActualWidth;
+            double left = 0;
+            if(this.LeadingElement != null)
+            {
+                left = LeadingElement.DesiredSize.Width;
+            }
+            double avW = ActualWidth - left;
             double avH = ActualHeight;
 
-            List<(Point symbolpt, Point textpt, FormattedText symbolft, FormattedText txtft, bool addtrim)> renderlist = [];
+            List<(Point symbolpt, Point textpt, FormattedText? symbolft, FormattedText txtft, bool addtrim)> renderlist = [];
 
             var symbol_y = 0.0;
             var text_y = 0.0;
@@ -307,36 +351,43 @@ namespace QSoft.WPF.TextBlockT
                 for (int i = 0; i < items[j].Elements.Length; i++)
                 {
                     var item = items[j].Elements[i];
-                    var w = avW - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
-                    var symbolft = MakeSymbolText(item.Symbol, avW);
-                    w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+                    var w = avW;
+                    FormattedText? symbolft = null;
+                    if (item.Symbol != null)
+                    {
+                        w = w - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+                        symbolft = MakeSymbolText(item.Symbol, avW);
+                        w = w - symbolft.WidthIncludingTrailingWhitespace - item.Symbol.Padding.Left - item.Symbol.Padding.Right;
+                    }
+                    
                     var txtft = MakeText(item, item.Text, w);
 
                     txtft.MaxTextHeight = avH - text_y;
-                    symbol_y = symbol_y + item.Symbol.Padding.Top;
+                    symbol_y = symbol_y + (item.Symbol == null ? 0.0 : item.Symbol.Padding.Top);
                     text_y = text_y + item.Padding.Top;
-                    var symbolpt = new Point(item.Symbol.Padding.Left, symbol_y);
-                    //if (txtft.Height > 0)
-                    //{
-                    //    dc.DrawText(symbolft, symbolpt);
-                    //}
-
-
-                    var text_x = item.Symbol.Padding.Left + symbolft.WidthIncludingTrailingWhitespace + item.Symbol.Padding.Right + item.Padding.Left;
+                    var symbolpt = new Point((item.Symbol == null ? 0.0 :item.Symbol.Padding.Left+left), symbol_y);
+                    var text_x = item.Padding.Left;
+                    if(item.Symbol != null)
+                    {
+                        text_x = text_x + item.Symbol.Padding.Left + item.Symbol.Padding.Right;
+                        if(symbolft != null)
+                        {
+                            text_x = text_x+ symbolpt.X + symbolft.WidthIncludingTrailingWhitespace;
+                        }
+                    }
+                    else
+                    {
+                        text_x = text_x + left;
+                    }
                     var textpt = new Point(text_x, text_y);
-
-                    //dc.DrawText(txtft, textpt);
-
-
-
 
                     text_y = symbol_y = text_y + txtft.Height + item.Padding.Bottom;
 
                     if (txtft.Height == 0)
                     {
-                        if (renderlist.Any())
+                        if (renderlist.Count>0)
                         {
-                            var aa = renderlist.Last();
+                            var aa = renderlist[^1];
                             var aa1 = (aa.symbolpt, aa.textpt, aa.symbolft, m_trimmingft, true);
                             renderlist.Remove(aa);
                             renderlist.Add(aa1);
@@ -357,10 +408,9 @@ namespace QSoft.WPF.TextBlockT
 
                 foreach (var oo in renderlist)
                 {
-                    if (oo.txtft.Height > 0)
+                    if (oo.txtft.Height > 0 && oo.symbolft != null)
                     {
                         dc.DrawText(oo.symbolft, oo.symbolpt);
-
                     }
                     dc.DrawText(oo.txtft, oo.textpt);
                 }
