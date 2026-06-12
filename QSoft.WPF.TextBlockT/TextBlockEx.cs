@@ -236,17 +236,17 @@ namespace QSoft.WPF.TextBlockT
             catch { return 1.0; }
         }
 
-        private FormattedText MakeText(TextBlockExElement item, string text, double maxWidth, double? fontSize = null)
+        private FormattedText MakeText(TextBlockExElement item, string text, double maxWidth)
         {
             var ft = new FormattedText(
                 string.IsNullOrEmpty(text) ? " " : text,
                 CultureInfo.CurrentUICulture,
                 FlowDirection.LeftToRight,
                 new Typeface(item.FontFamily, item.FontStyle, item.FontWeight, item.FontStretch),
-                fontSize ?? item.FontSize,
+                item.FontSize,
                 item.Foreground,
                 PixelsPerDip());
-
+            //ft.Trimming = TextTrimming.None;
             ft.MaxTextWidth = Math.Max(1.0, maxWidth);
             return ft;
         }
@@ -341,11 +341,12 @@ namespace QSoft.WPF.TextBlockT
             double avW = ActualWidth - left;
             double avH = ActualHeight;
 
-            List<(Point symbolpt, Point textpt, FormattedText? symbolft, FormattedText txtft, bool addtrim)> renderlist = [];
+            List<(Point symbolpt, Point textpt, FormattedText? symbolft, FormattedText txtft)> renderlist = [];
 
             var symbol_y = 0.0;
             var text_y = 0.0;
             FormattedText? m_trimmingft = null;
+            bool isend = false;
             for(int j=0;j<items.Count; j++)
             {
                 for (int i = 0; i < items[j].Elements.Length; i++)
@@ -361,8 +362,11 @@ namespace QSoft.WPF.TextBlockT
                     }
                     
                     var txtft = MakeText(item, item.Text, w);
+                    var maxh = avH - text_y;
+                    isend = txtft.Height > maxh;
+                    txtft.MaxTextHeight = maxh;
 
-                    txtft.MaxTextHeight = avH - text_y;
+
                     symbol_y = symbol_y + (item.Symbol == null ? 0.0 : item.Symbol.Padding.Top);
                     text_y = text_y + item.Padding.Top;
                     var symbolpt = new Point((item.Symbol == null ? 0.0 :item.Symbol.Padding.Left+left), symbol_y);
@@ -385,36 +389,40 @@ namespace QSoft.WPF.TextBlockT
 
                     if (txtft.Height == 0)
                     {
-                        if (renderlist.Count>0)
+                        if (renderlist.Count > 0)
                         {
                             var aa = renderlist[^1];
-                            var aa1 = (aa.symbolpt, aa.textpt, aa.symbolft, m_trimmingft, true);
+                            var aa1 = (aa.symbolpt, aa.textpt, aa.symbolft, m_trimmingft);
                             renderlist.Remove(aa);
                             renderlist.Add(aa1);
                         }
-
+                        isend = true;
                         break;
                     }
 
                     if (text_y > avH)
                     {
-
                         break;
                     }
-                    m_trimmingft = MakeText(item, item.Text.TrimEnd() + " ...", w);
+                    m_trimmingft = MakeText(item, item.Text.TrimEnd() + "...", w);
                     m_trimmingft.MaxTextHeight = txtft.MaxTextHeight;
-                    renderlist.Add((symbolpt, textpt, symbolft, txtft, false));
+                    renderlist.Add((symbolpt, textpt, symbolft, txtft));
                 }
-
-                foreach (var oo in renderlist)
+                if (isend)
                 {
-                    if (oo.txtft.Height > 0 && oo.symbolft != null)
-                    {
-                        dc.DrawText(oo.symbolft, oo.symbolpt);
-                    }
-                    dc.DrawText(oo.txtft, oo.textpt);
+                    break;
                 }
 
+
+            }
+
+            foreach (var oo in renderlist)
+            {
+                if (oo.txtft.Height > 0 && oo.symbolft != null)
+                {
+                    dc.DrawText(oo.symbolft, oo.symbolpt);
+                }
+                dc.DrawText(oo.txtft, oo.textpt);
             }
         }
     }
