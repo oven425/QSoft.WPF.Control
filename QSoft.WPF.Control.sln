@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.Control", "QSoft.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.ControlT", "QSoft.WPF.ControlT\QSoft.WPF.ControlT.csproj", "{F968538F-5581-4C72-BD04-32B8A0517DD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1\WpfApp1.csproj", "{BE32B3A8-0184-4499-8B83-FF300E53B92F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListView", "QSoft.WPF.TreeListView\QSoft.WPF.TreeListView.csproj", "{F633F868-A2E1-E51B-FD03-E2A96033F227}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListViewT", "QSoft.WPF.TreeListViewT\QSoft.WPF.TreeListViewT.csproj", "{641932F2-CB91-A628-14E9-440172B2FEAE}"
@@ -31,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp_CFG", "ConsoleAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_ChildProcess_IPC", "WpfApp_ChildProcess_IPC\WpfApp_ChildProcess_IPC.csproj", "{946EE5AD-B352-41A8-8379-7B039684E32F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_Tooltip", "WpfApp_Tooltip\WpfApp_Tooltip.csproj", "{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,10 +45,6 @@ Global
 		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F968538F-5581-4C72-BD04-32B8A0517DD5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE32B3A8-0184-4499-8B83-FF300E53B92F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F633F868-A2E1-E51B-FD03-E2A96033F227}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -93,6 +89,10 @@ Global
 		{946EE5AD-B352-41A8-8379-7B039684E32F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{946EE5AD-B352-41A8-8379-7B039684E32F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{946EE5AD-B352-41A8-8379-7B039684E32F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

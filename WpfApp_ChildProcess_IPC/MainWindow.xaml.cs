@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -32,7 +34,7 @@ namespace WpfApp_ChildProcess_IPC
                 FileName = "powershell",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
-                CreateNoWindow = true,
+                //CreateNoWindow = true,
                 Arguments = "-ExecutionPolicy Bypass -File Clock.ps1"
             };
             try
@@ -45,11 +47,13 @@ namespace WpfApp_ChildProcess_IPC
                 while (true)
                 {
                     var line = await this.m_ChildProcess.StandardOutput.ReadLineAsync();
-                    if (line is null) continue;
-                    
+                    if (line is null) break;
                     var message = JsonSerializer.Deserialize<ClockMessage>(line);
                     System.Diagnostics.Trace.WriteLine(message);
+                    this.textblock.Text = $"{message.Culture}-{message.Timestamp:yyyy/MM/dd HH:mm:ss}";
                 }
+                this.textblock.Text = $"{this.textblock.Text}-End";
+
             }
             catch (Exception ex)
             {
@@ -62,9 +66,23 @@ namespace WpfApp_ChildProcess_IPC
     public sealed record ClockMessage
     {
         [JsonPropertyName("culture")]
-        public string Culture { get; init; } = string.Empty;
+        public string Culture { get; init; } = "";
 
         [JsonPropertyName("timestamp")]
         public DateTimeOffset Timestamp { get; init; }
+    }
+
+    public class MainUI : INotifyPropertyChanged
+    {
+        string m_Text = "";
+        public string Text
+        {
+            set { m_Text = value; this.Update(); }
+            get => this.m_Text;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        void Update([CallerMemberName]string name="")
+            =>this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
