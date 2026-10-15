@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_ChildProcess_IPC", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_Tooltip", "WpfApp_Tooltip\WpfApp_Tooltip.csproj", "{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp_SrumDatabase", "ConsoleApp_SrumDatabase\ConsoleApp_SrumDatabase.csproj", "{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FA3DBBD-A505-4E27-9D6A-11683BE1367A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
