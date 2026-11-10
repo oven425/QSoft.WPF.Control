@@ -11,6 +11,7 @@ internal static partial class EsentNative
     internal const int JetWrnColumnNull = 1004;
     internal const int JetWrnBufferTruncated = 1006;
     internal const int JetErrNoCurrentRecord = -1603;
+    internal const int JetErrFileAccessDenied = -1032;
     internal const int JetMoveFirst = int.MinValue;
     internal const int JetMoveNext = 1;
     internal const uint JetParamSystemPath = 0;

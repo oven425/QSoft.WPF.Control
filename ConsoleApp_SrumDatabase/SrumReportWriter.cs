@@ -57,6 +57,45 @@ internal sealed class SrumReportWriter
             writer.WriteEndObject();
         });
 
+    public void WriteTableSummary(string databasePath, IReadOnlyList<SrumTableSummary> tables)
+    {
+        var ordered = tables
+            .OrderBy(table => table.Name, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Write("summary", $"SRUM summary for {databasePath}: {ordered.Length} table(s)", writer =>
+        {
+            writer.WriteStartObject();
+            writer.WriteString("databasePath", databasePath);
+            writer.WriteNumber("tableCount", ordered.Length);
+            writer.WriteStartArray("tables");
+            foreach (SrumTableSummary table in ordered)
+            {
+                writer.WriteStartObject();
+                writer.WriteString("name", table.Name);
+                writer.WriteNumber("rowCount", table.RowCount);
+                writer.WriteNumber("columnCount", table.ColumnCount);
+                writer.WriteNumber("indexCount", table.IndexCount);
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
+            writer.WriteEndObject();
+        });
+
+        foreach (SrumTableSummary table in ordered)
+        {
+            Write("table-summary", $"[{table.Name}] rows={table.RowCount} columns={table.ColumnCount} indexes={table.IndexCount}", writer =>
+            {
+                writer.WriteStartObject();
+                writer.WriteString("name", table.Name);
+                writer.WriteNumber("rowCount", table.RowCount);
+                writer.WriteNumber("columnCount", table.ColumnCount);
+                writer.WriteNumber("indexCount", table.IndexCount);
+                writer.WriteEndObject();
+            });
+        }
+    }
+
     public void WriteColumn(string tableName, SrumColumnSchema column, IReadOnlyList<SrumIndexKey> indexKeys) =>
         Write("column", $"  {column.Name,-40} {column.TypeName,-16} type={column.EsentType} id={column.ColumnId} max={column.MaxLength} bytes cp={column.CodePage}{FormatColumnIndexKeys(indexKeys)}", writer =>
         {
