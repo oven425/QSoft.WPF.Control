@@ -1,15 +1,7 @@
-﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace QSoft.WPF.SpiltButtonT
+namespace QSoft.WPF.DropDownButtonT
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -20,5 +12,10 @@ namespace QSoft.WPF.SpiltButtonT
         {
             InitializeComponent();
         }
+
+        void Log(string msg) => text_log.AppendText($"{DateTime.Now:HH:mm:ss.fff} {msg}{Environment.NewLine}");
+
+
+
     }
 }

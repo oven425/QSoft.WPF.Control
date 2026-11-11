@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_Tooltip", "WpfApp_To
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp_SrumDatabase", "ConsoleApp_SrumDatabase\ConsoleApp_SrumDatabase.csproj", "{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.SpiltButtonT", "QSoft.WPF.SpiltButtonT\QSoft.WPF.SpiltButtonT.csproj", "{6C684E59-76AA-49CF-ADA0-82AD5B73F963}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.DropDownButtonT", "QSoft.WPF.DropDownButtonT\QSoft.WPF.DropDownButtonT.csproj", "{187AF330-EA22-4E15-9A6B-3FD726735173}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,10 +101,10 @@ Global
 		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{505B1EA8-1BF0-4660-B76D-E330B9C52A8F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C684E59-76AA-49CF-ADA0-82AD5B73F963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C684E59-76AA-49CF-ADA0-82AD5B73F963}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C684E59-76AA-49CF-ADA0-82AD5B73F963}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C684E59-76AA-49CF-ADA0-82AD5B73F963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{187AF330-EA22-4E15-9A6B-3FD726735173}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{187AF330-EA22-4E15-9A6B-3FD726735173}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{187AF330-EA22-4E15-9A6B-3FD726735173}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{187AF330-EA22-4E15-9A6B-3FD726735173}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

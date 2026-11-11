@@ -1,8 +1,8 @@
-﻿using System.Configuration;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
-namespace QSoft.WPF.SpiltButtonT
+namespace QSoft.WPF.DropDownButtonT
 {
     /// <summary>
     /// Interaction logic for App.xaml
