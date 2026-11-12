@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Input;
+using System.Windows.Media;
 
 namespace QSoft.WPF.DropDownButtonT
 {
@@ -12,18 +10,26 @@ namespace QSoft.WPF.DropDownButtonT
     /// Flyout can be a ContextMenu (like MenuFlyout), a Popup, or any content (like Flyout).
     /// Style is inherited from Button for now.
     /// </summary>
-    public class DropDownButton : Button
+    public class DropDownButton : System.Windows.Controls.Button
     {
         Popup? m_ContentPopup;
         object? m_LogicalFlyout;
+        bool m_PressedInPopup;
         bool m_OwnsPopup;
-        bool m_MenuDataContextBound;
         bool m_SuppressClick;
+
+        static DropDownButton()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DropDownButton), new FrameworkPropertyMetadata(typeof(DropDownButton)));
+        }
 
         public static readonly DependencyProperty FlyoutProperty =
             DependencyProperty.Register(nameof(Flyout), typeof(object), typeof(DropDownButton),
                 new FrameworkPropertyMetadata(null, (d, e) => ((DropDownButton)d).OnFlyoutChanged(e.OldValue, e.NewValue)));
 
+        /// <summary>
+        /// The popup content. A completed left click inside the popup closes it by default.
+        /// </summary>
         public object? Flyout
         {
             get => GetValue(FlyoutProperty);
@@ -49,6 +55,16 @@ namespace QSoft.WPF.DropDownButtonT
         {
             get => (PlacementMode)GetValue(FlyoutPlacementProperty);
             set => SetValue(FlyoutPlacementProperty, value);
+        }
+
+        public static readonly DependencyProperty CloseFlyoutOnItemClickProperty =
+            DependencyProperty.Register(nameof(CloseFlyoutOnItemClick), typeof(bool), typeof(DropDownButton), new FrameworkPropertyMetadata(true));
+
+        /// <summary>Close the flyout on a left click inside it or when a button or menu item is activated.</summary>
+        public bool CloseFlyoutOnItemClick
+        {
+            get => (bool)GetValue(CloseFlyoutOnItemClickProperty);
+            set => SetValue(CloseFlyoutOnItemClickProperty, value);
         }
 
         public static readonly RoutedEvent FlyoutOpenedEvent =
@@ -86,12 +102,35 @@ namespace QSoft.WPF.DropDownButtonT
             ShowFlyout();
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        // Input inside the flyout bubbles to this button through the Popup; it must not drive Button press/click logic,
+        // otherwise the button captures the mouse, the Popup light-dismisses, and the mouse up reopens it.
+        protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (IsFromSelf(e.OriginalSource)) base.OnMouseLeftButtonDown(e);
+        }
+
+        protected override void OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (IsFromSelf(e.OriginalSource)) base.OnMouseLeftButtonUp(e);
+        }
+
+        protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
+        {
+            if (IsFromSelf(e.OriginalSource)) base.OnMouseMove(e);
+        }
+
+        protected override void OnKeyUp(System.Windows.Input.KeyEventArgs e)
+        {
+            if (IsFromSelf(e.OriginalSource)) base.OnKeyUp(e);
+        }
+
+        protected override void OnKeyDown(System.Windows.Input.KeyEventArgs e)
+        {
+            if (!IsFromSelf(e.OriginalSource)) return;
             base.OnKeyDown(e);
             if (e.Handled) return;
-            var key = e.Key == Key.System ? e.SystemKey : e.Key;
-            if (key == Key.F4 || (key == Key.Down && (Keyboard.Modifiers & ModifierKeys.Alt) != 0))
+            var key = e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key;
+            if (key == System.Windows.Input.Key.F4 || (key == System.Windows.Input.Key.Down && (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Alt) != 0))
             {
                 SetCurrentValue(IsFlyoutOpenProperty, !IsFlyoutOpen);
                 e.Handled = true;
@@ -131,7 +170,7 @@ namespace QSoft.WPF.DropDownButtonT
                         StaysOpen = false,
                         Focusable = false,
                         AllowsTransparency = true,
-                        Child = newValue as UIElement ?? new ContentPresenter { Content = newValue },
+                        Child = newValue as UIElement ?? new System.Windows.Controls.ContentPresenter { Content = newValue },
                     };
                     m_ContentPopup = popupHost;
                     m_OwnsPopup = true;
@@ -148,7 +187,11 @@ namespace QSoft.WPF.DropDownButtonT
             {
                 m_ContentPopup.Opened -= Popup_Opened;
                 m_ContentPopup.Closed -= Popup_Closed;
-                m_ContentPopup.RemoveHandler(PreviewKeyDownEvent, (KeyEventHandler)Popup_PreviewKeyDown);
+                m_ContentPopup.RemoveHandler(PreviewKeyDownEvent, (System.Windows.Input.KeyEventHandler)Popup_PreviewKeyDown);
+                m_ContentPopup.RemoveHandler(ClickEvent, (RoutedEventHandler)FlyoutItem_Click);
+                m_ContentPopup.RemoveHandler(MouseLeftButtonDownEvent, (System.Windows.Input.MouseButtonEventHandler)Popup_MouseLeftButtonDown);
+                m_ContentPopup.RemoveHandler(MouseLeftButtonUpEvent, (System.Windows.Input.MouseButtonEventHandler)Popup_MouseLeftButtonUp);
+                m_PressedInPopup = false;
                 if (m_OwnsPopup)
                 {
                     m_ContentPopup.Child = null;
@@ -177,7 +220,10 @@ namespace QSoft.WPF.DropDownButtonT
         {
             popup.Opened += Popup_Opened;
             popup.Closed += Popup_Closed;
-            popup.AddHandler(PreviewKeyDownEvent, (KeyEventHandler)Popup_PreviewKeyDown, true);
+            popup.AddHandler(PreviewKeyDownEvent, (System.Windows.Input.KeyEventHandler)Popup_PreviewKeyDown, true);
+            popup.AddHandler(ClickEvent, (RoutedEventHandler)FlyoutItem_Click, true);
+            popup.AddHandler(MouseLeftButtonDownEvent, (System.Windows.Input.MouseButtonEventHandler)Popup_MouseLeftButtonDown, true);
+            popup.AddHandler(MouseLeftButtonUpEvent, (System.Windows.Input.MouseButtonEventHandler)Popup_MouseLeftButtonUp, true);
         }
 
         void ApplyPlacement()
@@ -215,10 +261,6 @@ namespace QSoft.WPF.DropDownButtonT
             if (IsFlyoutOpen) OnIsFlyoutOpenChanged(true);
         }
 
-        void Menu_Opened(object sender, RoutedEventArgs e) => OnFlyoutOpened();
-
-        void Menu_Closed(object sender, RoutedEventArgs e) => OnFlyoutClosed();
-
         void Popup_Opened(object? sender, EventArgs e)
         {
             if (m_ContentPopup?.Child is UIElement child)
@@ -227,7 +269,7 @@ namespace QSoft.WPF.DropDownButtonT
                 {
                     if (m_ContentPopup?.IsOpen == true)
                     {
-                        child.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+                        child.MoveFocus(new System.Windows.Input.TraversalRequest(System.Windows.Input.FocusNavigationDirection.First));
                     }
                 }, System.Windows.Threading.DispatcherPriority.Input);
             }
@@ -236,6 +278,7 @@ namespace QSoft.WPF.DropDownButtonT
 
         void Popup_Closed(object? sender, EventArgs e)
         {
+            m_PressedInPopup = false;
             if (m_ContentPopup?.Child is UIElement child && child.IsKeyboardFocusWithin)
             {
                 Focus();
@@ -243,13 +286,18 @@ namespace QSoft.WPF.DropDownButtonT
             OnFlyoutClosed();
         }
 
-        void Popup_PreviewKeyDown(object sender, KeyEventArgs e)
+        void Popup_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            if (e.Key == System.Windows.Input.Key.Escape)
             {
                 HideFlyout();
                 Focus();
                 e.Handled = true;
+            }
+            else if (!e.Handled && System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.None && e.OriginalSource is System.Windows.Controls.Button button && e.Key is System.Windows.Input.Key.Up or System.Windows.Input.Key.Down)
+            {
+                var direction = e.Key == System.Windows.Input.Key.Down ? System.Windows.Input.FocusNavigationDirection.Next : System.Windows.Input.FocusNavigationDirection.Previous;
+                e.Handled = button.MoveFocus(new System.Windows.Input.TraversalRequest(direction));
             }
         }
 
@@ -261,30 +309,65 @@ namespace QSoft.WPF.DropDownButtonT
 
         void OnFlyoutClosed()
         {
-            if (Mouse.LeftButton == MouseButtonState.Pressed && IsPointerOverSelf())
+            if (System.Windows.Input.Mouse.LeftButton == System.Windows.Input.MouseButtonState.Pressed && IsPointerOverSelf())
             {
                 // Light dismiss caused by pressing on this button: swallow the resulting click.
                 m_SuppressClick = true;
-                InputManager.Current.PostProcessInput += ClearSuppressAfterMouseUp;
+                System.Windows.Input.InputManager.Current.PostProcessInput += ClearSuppressAfterMouseUp;
             }
             SetCurrentValue(IsFlyoutOpenProperty, false);
             RaiseEvent(new RoutedEventArgs(FlyoutClosedEvent, this));
         }
 
+        void FlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsFlyoutOpen && CloseFlyoutOnItemClick) HideFlyout();
+        }
+
+        void Popup_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            m_PressedInPopup = IsFlyoutOpen && CloseFlyoutOnItemClick;
+        }
+
+        void Popup_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var pressedInPopup = m_PressedInPopup;
+            m_PressedInPopup = false;
+            if (pressedInPopup && IsFlyoutOpen && CloseFlyoutOnItemClick && m_ContentPopup?.Child is UIElement child)
+            {
+                var position = e.GetPosition(child);
+                if (position.X >= 0 && position.Y >= 0 && position.X < child.RenderSize.Width && position.Y < child.RenderSize.Height)
+                    HideFlyout();
+            }
+        }
+
+        bool IsFromSelf(object? source)
+        {
+            for (var d = source as DependencyObject; d != null; d = GetParent(d))
+            {
+                if (ReferenceEquals(d, this)) return true;
+            }
+            return false;
+        }
+
+        // Visual-first walk: flyout content ends at the PopupRoot, so it is never treated as part of this button.
+        static DependencyObject? GetParent(DependencyObject d)
+            => d is Visual || d is System.Windows.Media.Media3D.Visual3D ? VisualTreeHelper.GetParent(d) : LogicalTreeHelper.GetParent(d);
+
         bool IsPointerOverSelf()
         {
             if (PresentationSource.FromVisual(this) == null) return false;
-            var pt = Mouse.GetPosition(this);
+            var pt = System.Windows.Input.Mouse.GetPosition(this);
             return pt.X >= 0 && pt.Y >= 0 && pt.X < ActualWidth && pt.Y < ActualHeight;
         }
 
-        void ClearSuppressAfterMouseUp(object sender, ProcessInputEventArgs e)
+        void ClearSuppressAfterMouseUp(object sender, System.Windows.Input.ProcessInputEventArgs e)
         {
-            if (e.StagingItem.Input is MouseButtonEventArgs args
-                && args.RoutedEvent == Mouse.MouseUpEvent
-                && args.ChangedButton == MouseButton.Left)
+            if (e.StagingItem.Input is System.Windows.Input.MouseButtonEventArgs args
+                && args.RoutedEvent == System.Windows.Input.Mouse.MouseUpEvent
+                && args.ChangedButton == System.Windows.Input.MouseButton.Left)
             {
-                InputManager.Current.PostProcessInput -= ClearSuppressAfterMouseUp;
+                System.Windows.Input.InputManager.Current.PostProcessInput -= ClearSuppressAfterMouseUp;
                 m_SuppressClick = false;
             }
         }

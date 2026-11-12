@@ -12,10 +12,5 @@ namespace QSoft.WPF.DropDownButtonT
         {
             InitializeComponent();
         }
-
-        void Log(string msg) => text_log.AppendText($"{DateTime.Now:HH:mm:ss.fff} {msg}{Environment.NewLine}");
-
-
-
     }
 }

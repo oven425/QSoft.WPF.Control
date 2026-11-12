@@ -7,9 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <DockPanel Margin="10">
-        <TextBox x:Name="text_log" DockPanel.Dock="Bottom" Height="150" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
         <StackPanel>
-            <!-- MenuFlyout equivalent -->
             <local:DropDownButton  HorizontalAlignment="Left" Margin="0,0,0,10">
                 <local:DropDownButton.Content>
                     <StackPanel Orientation="Horizontal">
@@ -19,9 +17,20 @@
                 </local:DropDownButton.Content>
                 <local:DropDownButton.Flyout>
                     <Border CornerRadius="6" Background="Red" Width="150">
+                        <StackPanel KeyboardNavigation.TabNavigation="Cycle" Margin="10">
+                            <TextBlock Text="Test 1"/>
+                            <TextBlock Text="Test 2"/>
+                        </StackPanel>
+                    </Border>
+                </local:DropDownButton.Flyout>
+            </local:DropDownButton>
+            <local:DropDownButton Content="Buttons" HorizontalAlignment="Left">
+                <local:DropDownButton.Flyout>
+                    <Border CornerRadius="6" Background="White" BorderBrush="Gray" BorderThickness="1" Padding="4" Width="150">
                         <StackPanel>
-                            <TextBlock Text="Test 1"/>
-                            <TextBlock Text="Test 1"/>
+                            <Button Content="Item 1"/>
+                            <Button Content="Item 2"/>
+                            <CheckBox Content="Option (closes flyout)"/>
                         </StackPanel>
                     </Border>
                 </local:DropDownButton.Flyout>
