@@ -1,0 +1,133 @@
+<Window x:Class="WpfApp_Path.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SVG to WPF Path"
+        Width="920"
+        Height="690"
+        MinWidth="760"
+        MinHeight="620"
+        Background="#111827"
+        Foreground="#F3F4F6"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <SolidColorBrush x:Key="IconWhite" Color="White" />
+        <Geometry x:Key="QuestionGeometry">M6.95176 8.961C6.95176 8.719 6.98476 8.50267 7.05076 8.312C7.11676 8.12133 7.22309 7.94167 7.36976 7.773C7.52376 7.60433 7.72542 7.432 7.97476 7.256C8.19476 7.09467 8.37076 6.95167 8.50276 6.827C8.64209 6.70233 8.74109 6.57767 8.79976 6.453C8.86576 6.32833 8.89876 6.189 8.89876 6.035C8.89876 5.80033 8.81076 5.62433 8.63476 5.507C8.46609 5.38233 8.22776 5.32 7.91976 5.32C7.61176 5.32 7.30742 5.36767 7.00676 5.463C6.70609 5.55833 6.39809 5.68667 6.08276 5.848L5.49976 4.671C5.85909 4.473 6.24776 4.31167 6.66576 4.187C7.08376 4.06233 7.54209 4 8.04076 4C8.80342 4 9.39376 4.18333 9.81176 4.55C10.2371 4.91667 10.4498 5.38233 10.4498 5.947C10.4498 6.24767 10.4021 6.508 10.3068 6.728C10.2114 6.948 10.0684 7.15333 9.87776 7.344C9.68709 7.52733 9.44876 7.72533 9.16276 7.938C8.95009 8.092 8.78509 8.224 8.66776 8.334C8.55042 8.444 8.46976 8.55033 8.42576 8.653C8.38909 8.75567 8.37076 8.884 8.37076 9.038V9.357H6.95176V8.961ZM6.77576 11.194C6.77576 10.8567 6.86742 10.622 7.05076 10.49C7.23409 10.3507 7.45776 10.281 7.72176 10.281C7.97842 10.281 8.19842 10.3507 8.38176 10.49C8.56509 10.622 8.65676 10.8567 8.65676 11.194C8.65676 11.5167 8.56509 11.7513 8.38176 11.898C8.19842 12.0373 7.97842 12.107 7.72176 12.107C7.45776 12.107 7.23409 12.0373 7.05076 11.898C6.86742 11.7513 6.77576 11.5167 6.77576 11.194Z</Geometry>
+        <GeometryGroup x:Key="HelpCircleGeometry" FillRule="EvenOdd">
+            <EllipseGeometry Center="8,8" RadiusX="8" RadiusY="8" />
+            <EllipseGeometry Center="8,8" RadiusX="6.8" RadiusY="6.8" />
+            <StaticResource ResourceKey="QuestionGeometry" />
+        </GeometryGroup>
+        <Style x:Key="PanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1F2937" />
+            <Setter Property="BorderBrush" Value="#374151" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="20" />
+        </Style>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28">
+            <TextBlock Text="SVG → WPF Path.Data"
+                       FontSize="26"
+                       FontWeight="SemiBold" />
+            <TextBlock Margin="0,6,0,22"
+                       Foreground="#9CA3AF"
+                       Text="以提供的 SVG 為準：保留原始問號輪廓，將外圈描邊轉成填色環，合併為單一 Path。" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource PanelStyle}">
+                    <StackPanel>
+                        <TextBlock Text="原始 SVG 的繪製方式"
+                                   FontSize="17"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Margin="0,4,0,12"
+                                   Foreground="#9CA3AF"
+                                   Text="圓形描邊 + 問號填色（兩個圖形）" />
+                        <Border Height="176"
+                                Background="#0B1220"
+                                CornerRadius="8">
+                            <Viewbox Stretch="Uniform" Margin="24">
+                                <Canvas Width="16" Height="16">
+                                    <Ellipse Canvas.Left="0.6"
+                                             Canvas.Top="0.6"
+                                             Width="14.8"
+                                             Height="14.8"
+                                             Stroke="{StaticResource IconWhite}"
+                                             StrokeThickness="1.2"
+                                             Opacity="0.5" />
+                                    <Path Data="{StaticResource QuestionGeometry}"
+                                          Fill="{StaticResource IconWhite}"
+                                          Opacity="0.5" />
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource PanelStyle}">
+                    <StackPanel>
+                        <TextBlock Text="轉換後的 WPF"
+                                   FontSize="17"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Margin="0,4,0,12"
+                                   Foreground="#9CA3AF"
+                                   Text="一個 Path，Data 含四個封閉輪廓" />
+                        <Border Height="176"
+                                Background="#0B1220"
+                                CornerRadius="8">
+                            <Viewbox Stretch="Uniform" Margin="24">
+                                <Canvas Width="16" Height="16">
+                                    <Path Data="{StaticResource HelpCircleGeometry}"
+                                          Fill="{StaticResource IconWhite}"
+                                          Opacity="0.5" />
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Margin="0,16,0,0" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="轉換原理與步驟"
+                               FontSize="17"
+                               FontWeight="SemiBold" />
+                    <TextBlock Margin="0,10,0,0"
+                               TextWrapping="Wrap"
+                               LineHeight="24"
+                               Foreground="#D1D5DB">
+                        1. SVG 外圈是中心線半徑 7.4、寬 1.2 的圓形描邊。展開描邊後，外半徑 = 7.4 + 0.6 = 8，內半徑 = 7.4 - 0.6 = 6.8。<LineBreak />
+                        2. 用 WPF EllipseGeometry 表示外圓與內圓，再接上 SVG 原始問號的兩個輪廓；問號路徑座標不變。<LineBreak />
+                        3. GeometryGroup 的 EvenOdd 填充規則讓內圓成為透明洞；Path 設為白色、Opacity="0.5"，對應 SVG 的顏色與透明度。
+                    </TextBlock>
+                    <Border Margin="0,14,0,0"
+                            Padding="12"
+                            Background="#0B1220"
+                            CornerRadius="8">
+                        <TextBlock FontFamily="Consolas"
+                                   FontSize="13"
+                                   Foreground="#A7F3D0"
+                                   TextWrapping="Wrap">
+                            &lt;Path Data="{StaticResource HelpCircleGeometry}" Fill="White" Opacity="0.5" /&gt;
+                        </TextBlock>
+                    </Border>
+                    <TextBlock x:Name="ComparisonResult"
+                               Margin="0,14,0,0"
+                               Foreground="#93C5FD"
+                               TextWrapping="Wrap" />
+                    <TextBlock Margin="0,6,0,0"
+                               Foreground="#9CA3AF"
+                               TextWrapping="Wrap"
+                               Text="比對方式：以相同 WPF 光柵器，逐像素比較「SVG 等效的描邊圓＋原始問號」和「合併 Path」。這能量化幾何合併造成的差異；與不同 SVG 瀏覽器光柵器的抗鋸齒結果不作等同宣稱。" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
